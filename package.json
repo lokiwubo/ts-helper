@@ -1,0 +1,31 @@
+{
+  "name": "@ts-helper",
+  "version": "1.0.0",
+  "description": "ts工具类方法",
+  "main": "dist/index.js",
+  "types": "types/index.d.ts",
+  "module": "dist/index.esm.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint src/**",
+    "build": "rimraf dist types && rollup --bundleConfigAsCjs -c && tsc -p tsconfig.json"
+  },
+  "keywords": [],
+  "author": "宜黄people",
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/lodash-es": "^4.17.12",
+    "eslint": "^9.9.0",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.20.0",
+    "tslib": "^2.6.3",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.0.1"
+  },
+  "dependencies": {
+    "lodash-es": "^4.17.21"
+  }
+}
