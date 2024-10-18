@@ -4,7 +4,9 @@ import {
 } from "./like";
 import { Add, Sub } from "./number";
 import {  ReturnPromiseType } from "./shared";
-
+/**
+ * @description 用来转为数组
+ */
 export type SetArray<T> = T extends ArrayListLike ? [...T] : [T];
 
 export type ArrayConcat<T, A> = [...SetArray<T>, ...SetArray<A>];

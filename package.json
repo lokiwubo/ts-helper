@@ -1,9 +1,9 @@
 {
-  "name": "@ts-helper",
+  "name": "ts-utils-helper",
   "version": "1.0.0",
   "description": "ts工具类方法",
   "main": "dist/index.js",
-  "types": "types/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "module": "dist/index.esm.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,8 +11,12 @@
     "build": "rimraf dist types && rollup --bundleConfigAsCjs -c && tsc -p tsconfig.json"
   },
   "keywords": [],
-  "author": "宜黄people",
+  "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:lokiwubo/-ts-helper.git"
+  },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@rollup/plugin-typescript": "^11.1.6",

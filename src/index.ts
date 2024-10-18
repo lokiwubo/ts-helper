@@ -1,14 +1,3 @@
-// export type * as array from "./lib/array";
-// export type * as is from "./lib/is";
-// export type * as like from "./lib/like";
-// export type * as map from "./lib/map";
-// export type * as number from "./lib/number";
-// export type * as object from "./lib/object";
-// export type * as shared from "./lib/shared";
-// export type * as string from "./lib/string";
-// export type * as url from "./lib/url";
-// export type * as utils from "./lib/utils";
-
 export * as array from "./operators/array";
 export * as middleware from "./operators/middleware";
 export * as number from "./operators/number";

@@ -37,23 +37,3 @@ export function chained<TContext>(funcs: ChainedFunType<TContext>[]) {
   };
 }
 
-//示例
-// chained<number>([
-//   function f1(x) {
-//     return x * 2;
-//   },
-// ])?.(0);
-
-// middleware<number, string>([(a, next) => {
-//   next(a);
-//   return ''
-// }])(1);
-
-// asyncMiddleware<{ name: string }, string>([
-//   async (data, next) => {
-//     console.log("enter 1");
-//     await next(data);
-//     console.log("exit 1");
-//     return ''
-//   },
-// ])({ name: "Lucy" });

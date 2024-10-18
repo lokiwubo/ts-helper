@@ -23,6 +23,10 @@ export type TypeAssert<T, A> = T extends A ? T : never;
 
 export type SeniorNonNullable<T> = Exclude<T, undefined | null>;
 
+/**
+ * @description 把只读类型转为可写类型
+ * @example type writable = SeniorMutable<Readonly<{a:1}>>;
+ */
 export type SeniorMutable<T> = T extends Readonly<infer U>
   ? U extends ArrayListLike | Readonly<U>
     ? U extends readonly [...infer A]
@@ -33,10 +37,10 @@ export type SeniorMutable<T> = T extends Readonly<infer U>
     : U
   : T;
 
-// type writable = SeniorMutable<Readonly<{a:1}>>;
-// type writable = SeniorMutable< Readonly< [1, 2, 3]>>;
-// type writable = SeniorMutable<readonly [1, 2, 3]>;
 
+/**
+ * @description 转变为只读的联合类型
+ */
 export type ReadonlyUnion<T> = Readonly<T> | T;
 
 export type UnionToInterFunction<U> = (

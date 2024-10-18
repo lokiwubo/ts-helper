@@ -13,6 +13,10 @@ export default {
       format: 'esm',
     },
   ],
-  plugins: [typescript()],
+  plugins: [typescript({
+      tsconfig: './tsconfig.json', // 指定tsconfig.json文件
+      declaration: true, // 生成.d.ts声明文件
+      declarationDir: './dist/types', // 指定.d.ts文件的输出目录
+  })],
   external: [],
 };
