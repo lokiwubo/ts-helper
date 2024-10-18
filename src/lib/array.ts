@@ -1,9 +1,6 @@
-import {
-  ArrayListLike,
-  StringifiedLike,
-} from "./like";
+import { ArrayListLike, StringifiedLike } from "./like";
 import { Add, Sub } from "./number";
-import {  ReturnPromiseType } from "./shared";
+import { ReturnPromiseType } from "./shared";
 /**
  * @description 用来转为数组
  */
@@ -28,12 +25,12 @@ export type Pop<T extends ArrayListLike> = T extends [...infer A, unknown]
 type SeniorShiftHelper<
   T extends ArrayListLike,
   N extends number,
-  C extends number = 0
+  C extends number = 0,
 > = C extends N ? T : SeniorShiftHelper<Shift<T>, N, Add<C, 1>>;
 
 export type SeniorShift<
   T extends ArrayListLike,
-  N extends number
+  N extends number,
 > = SeniorShiftHelper<T, N>;
 
 // type seniorShift = SeniorShift<[1,2,3,4,5,6],2>
@@ -42,12 +39,12 @@ export type SeniorShift<
 type SeniorPopHelper<
   T extends ArrayListLike,
   N extends number,
-  C extends number = 0
+  C extends number = 0,
 > = C extends N ? T : SeniorPopHelper<Pop<T>, N, Add<C, 1>>;
 
 export type SeniorPop<
   T extends ArrayListLike,
-  N extends number
+  N extends number,
 > = SeniorPopHelper<T, N>;
 // type seniorShift = SeniorPop<[1,2,3,4,5,6],2>
 // [3, 4, 5, 6]
@@ -55,13 +52,13 @@ export type SeniorPop<
 type SliceHelper<
   A extends ArrayListLike,
   S extends number,
-  E extends number = Length<A>
+  E extends number = Length<A>,
 > = S extends E ? [] : SeniorShift<SeniorPop<A, Sub<Length<A>, E>>, S>;
 
 export type Slice<
   T extends ArrayListLike,
   S extends number,
-  E extends number = Length<T>
+  E extends number = Length<T>,
 > = SliceHelper<T, S, E>;
 
 export type UnShift<T extends ArrayListLike, A> = [...T, A];
@@ -71,18 +68,19 @@ export type UnionFromArray<T> = T extends (infer U)[] ? U : never;
 type JoinHelper<
   A extends StringifiedLike[],
   U extends string = "",
-  C extends string = ""
-> = Length<A> extends 0
-  ? C
-  : JoinHelper<
-      Slice<A, 1>,
-      U,
-      C extends "" ? `${First<A>}` : `${C}${U}${First<A>}`
-    >;
+  C extends string = "",
+> =
+  Length<A> extends 0
+    ? C
+    : JoinHelper<
+        Slice<A, 1>,
+        U,
+        C extends "" ? `${First<A>}` : `${C}${U}${First<A>}`
+      >;
 
 export type Join<
   T extends StringifiedLike[],
-  U extends string = ""
+  U extends string = "",
 > = JoinHelper<T, U>;
 
 // type join = Join<[1, 2, 3, 4], "-">;
@@ -90,7 +88,7 @@ export type Join<
 
 type ReturnPromiseArrayHelper<
   T extends (() => Promise<unknown>)[],
-  R extends ArrayListLike = []
+  R extends ArrayListLike = [],
 > = T extends [infer U, ...infer O]
   ? O extends (() => Promise<unknown>)[]
     ? ReturnPromiseArrayHelper<O, [...R, ReturnPromiseType<U>]>
@@ -103,7 +101,7 @@ export type ReturnPromiseArray<T extends (() => Promise<unknown>)[]> =
 
 export type FindFormIndex<
   T extends ArrayListLike,
-  I extends number
+  I extends number,
 > = T extends [infer U, ...infer O]
   ? I extends 0
     ? U
@@ -114,7 +112,7 @@ export type FindFormIndex<
 
 type FirstHelper<
   Tuple extends ArrayListLike,
-  U = FindFormIndex<Tuple, 0>
+  U = FindFormIndex<Tuple, 0>,
 > = U extends undefined ? Tuple[number] : U;
 
 export type First<Tuple extends ArrayListLike> = FirstHelper<Tuple>;
@@ -123,7 +121,7 @@ export type First<Tuple extends ArrayListLike> = FirstHelper<Tuple>;
 
 type LastHelper<
   Tuple extends ArrayListLike,
-  U = FindFormIndex<Tuple, Sub<Tuple["length"], 1>>
+  U = FindFormIndex<Tuple, Sub<Tuple["length"], 1>>,
 > = U extends undefined ? Tuple[number] : U;
 export type Last<Tuple extends ArrayListLike> = LastHelper<Tuple>;
 // type last = Last<[1, 2, 3, 4, 5]>;
@@ -139,7 +137,7 @@ export type Includes<Tuple extends ArrayListLike, O> = O extends Tuple[number]
 type IndexOfHelper<
   Tuple extends ArrayListLike,
   V,
-  S extends number = 0
+  S extends number = 0,
 > = Tuple extends [infer F, ...infer Rest]
   ? F extends V
     ? S
@@ -152,12 +150,12 @@ export type IndexOf<Tuple extends ArrayListLike, V> = IndexOfHelper<Tuple, V>;
 
 type ReverseHelper<
   Tuple extends ArrayListLike,
-  Cache extends ArrayListLike = []
+  Cache extends ArrayListLike = [],
 > = Tuple["length"] extends 0
   ? Cache
   : Tuple extends [...infer Rest, infer F]
-  ? ReverseHelper<Rest, Push<Cache, F>>
-  : Cache;
+    ? ReverseHelper<Rest, Push<Cache, F>>
+    : Cache;
 export type Reverse<Tuple extends ArrayListLike> = ReverseHelper<Tuple>;
 // type reverse = Reverse<[1, 2, 3, 4, 5]>;
 //  [5, 4, 3, 2, 1]
@@ -165,10 +163,13 @@ export type Reverse<Tuple extends ArrayListLike> = ReverseHelper<Tuple>;
 type FillArrayHelper<
   T extends number,
   U extends ArrayListLike = [],
-  V = unknown
+  V = unknown,
 > = Length<U> extends T ? U : FillArrayHelper<T, Push<U, V>, V>;
-export type FillArray<T extends number, V = unknown> = FillArrayHelper<T, [], V>;
-
+export type FillArray<T extends number, V = unknown> = FillArrayHelper<
+  T,
+  [],
+  V
+>;
 
 //entries set Map
 // type mapFromEntries = MapFromEntries<[[1, "a1"], [2, "b"]]>;

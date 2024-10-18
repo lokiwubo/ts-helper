@@ -19,43 +19,39 @@ export type IsTuple<T extends unknown[]> = number extends T["length"]
   ? false
   : true;
 
-export type IsEqual<A, B> = (<T>() => T extends A ? 1 : 2) extends <
-  T1
->() => T1 extends B ? 1 : 2
-  ? true
-  : false;
+export type IsEqual<A, B> =
+  (<T>() => T extends A ? 1 : 2) extends <T1>() => T1 extends B ? 1 : 2
+    ? true
+    : false;
 
 export type IsExtendsRight<A, B> = A extends B ? true : false;
 
 export type IsZero<N extends NumberLike> = IsExtendsRight<N, 0 | "0">;
 
-export type IsOverZero<N extends NumberLike> = IsZero<N> extends true
-  ? false
-  : IsExtendsRight<
-      Stringify<N> extends `${"-"}${infer Rest}` ? Rest : never,
-      never
-    >;
+export type IsOverZero<N extends NumberLike> =
+  IsZero<N> extends true
+    ? false
+    : IsExtendsRight<
+        Stringify<N> extends `${"-"}${infer Rest}` ? Rest : never,
+        never
+      >;
 
 export type IsLessZero<N extends NumberLike> = Not<IsOverZero<N>>;
 
-type IsOverHelper<
-  T extends NumberLike,
-  N extends NumberLike
-> = GenerateNumberUnion<0, T> extends GenerateNumberUnion<0, N> ? false : true;
+type IsOverHelper<T extends NumberLike, N extends NumberLike> =
+  GenerateNumberUnion<0, T> extends GenerateNumberUnion<0, N> ? false : true;
 
 //目前只支持整数
-export type IsOver<T extends NumberLike, N extends NumberLike> = IsEqual<
-  IsOverZero<T>,
-  IsOverZero<N>
-> extends true
-  ? IsEqual<T, N> extends true
-    ? false
+export type IsOver<T extends NumberLike, N extends NumberLike> =
+  IsEqual<IsOverZero<T>, IsOverZero<N>> extends true
+    ? IsEqual<T, N> extends true
+      ? false
+      : IsOverZero<T> extends true
+        ? IsOverHelper<T, N>
+        : Not<IsOverHelper<Abs<T>, Abs<N>>>
     : IsOverZero<T> extends true
-    ? IsOverHelper<T, N>
-    : Not<IsOverHelper<Abs<T>, Abs<N>>>
-  : IsOverZero<T> extends true
-  ? true
-  : false;
+      ? true
+      : false;
 // type isOver = IsOver<2, 2>;
 //true
 
@@ -75,22 +71,22 @@ export type IsLessOrEqual<T extends NumberLike, N extends NumberLike> = Or<
 
 type FixedLengthHelper<
   T extends string,
-  U extends ArrayListLike = []
+  U extends ArrayListLike = [],
 > = T extends `${infer L}${infer R}` ? FixedLengthHelper<R, [...U, L]> : U;
 
 export type IsFixedLengthString<
   T extends string,
-  L extends number
+  L extends number,
 > = FixedLengthHelper<`${T}`>["length"] extends L ? true : false;
 
 export type IsFixedLengthNumber<
   T extends number,
-  L extends number
+  L extends number,
 > = IsFixedLengthString<`${T}`, L>;
 
 export type IsFixedLengthArray<
   T extends ArrayListLike,
-  L extends number
+  L extends number,
 > = T["length"] extends L ? true : false;
 
 export type IsFloat<N extends NumberLike> =
