@@ -1,6 +1,6 @@
-import { RecordLike } from "@/lib/like";
-import { ParseRecordUrlQuery, ParseUrlQueryString } from "@/lib/url";
 import { get, isArray, set } from "lodash-es";
+import { RecordLike } from "../lib/like";
+import { ParseRecordUrlQuery, ParseUrlQueryString } from "../lib/url";
 
 export function queryStringify<T extends RecordLike>(obj: T) {
   const query = [];

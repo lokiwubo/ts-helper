@@ -1,6 +1,6 @@
 {
   "name": "ts-utils-helper",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "ts工具类方法",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",

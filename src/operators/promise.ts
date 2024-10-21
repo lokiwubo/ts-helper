@@ -1,8 +1,8 @@
-import { ReturnPromiseArray } from "@/lib/array";
+import { ReturnPromiseArray } from "../lib/array";
 
 export const retryPromise = async <T extends () => Promise<T>>(
   promiseFunc: T,
-  retries = 1
+  retries = 1,
 ): Promise<ReturnType<T>> => {
   const value = await new Promise((resolve, reject) => {
     const executePromise = () => {
@@ -24,7 +24,7 @@ export const retryPromise = async <T extends () => Promise<T>>(
 
 export const timeoutPromise = async <T extends () => Promise<T>>(
   asyncFn: () => Promise<T>,
-  time: number
+  time: number,
 ) => {
   return new Promise((resolve, reject) => {
     const timeoutId = setTimeout(() => {
@@ -54,25 +54,25 @@ export const cachePromise = function <T>(promiseFunc: () => Promise<T>) {
 
 export async function delay<T, U = T extends () => unknown ? ReturnType<T> : T>(
   ms: number,
-  value: T
+  value: T,
 ): Promise<U> {
   return new Promise((resolve) =>
-    setTimeout(resolve, ms, typeof value === "function" ? value() : value)
+    setTimeout(resolve, ms, typeof value === "function" ? value() : value),
   );
 }
 
 export async function limitPromise<T extends (() => Promise<unknown>)[]>(
   tasks: T,
-  limit: number
+  limit: number,
 ): Promise<ReturnPromiseArray<T>> {
   const results: Promise<unknown>[] = [];
   const runningTasks: Promise<unknown>[] = [];
   for (const task of tasks) {
     const resultPromise = task();
     results.push(resultPromise);
-    const overallPromise = Promise.resolve(resultPromise).then(() =>
-      runningTasks.splice(runningTasks.indexOf(overallPromise), 1)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const overallPromise = Promise.resolve(resultPromise).then(
+      () => runningTasks.splice(runningTasks.indexOf(overallPromise), 1),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ) as any;
     runningTasks.push(overallPromise);
     if (runningTasks.length >= limit) {

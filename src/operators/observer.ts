@@ -1,4 +1,4 @@
-import { FunctionLike } from "@/lib/like";
+import { FunctionLike } from "../lib/like";
 
 export class Observer<TSubscriber extends FunctionLike, TData> {
   private subscribers: TSubscriber[] = [];
@@ -7,7 +7,7 @@ export class Observer<TSubscriber extends FunctionLike, TData> {
   }
   unsubscribe(callback: TSubscriber) {
     this.subscribers = this.subscribers.filter(
-      (subscriber) => subscriber !== callback
+      (subscriber) => subscriber !== callback,
     );
   }
   notify(data: TData, preData: TData) {

@@ -1,5 +1,4 @@
-import { RecordLike } from "@/lib/like";
-
+import { RecordLike } from "../lib/like";
 
 export function assertNonNullish<T>(value: T): asserts value is NonNullable<T> {
   if (value == null) {
@@ -33,11 +32,11 @@ export function traversal<T extends RecordLike>(
       parentData?: T;
       prevItem?: T;
       nextItem?: T;
-    }
+    },
   ) => void,
   getChildren: (data: T) => T[],
   parentData?: T,
-  level?: number
+  level?: number,
 ) {
   const internalLevel = level ?? 0;
   data.forEach((item, index) => {
@@ -55,7 +54,7 @@ export function traversal<T extends RecordLike>(
       callback,
       getChildren,
       item,
-      internalLevel + 1
+      internalLevel + 1,
     );
   });
 }
