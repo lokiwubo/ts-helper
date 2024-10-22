@@ -1,4 +1,4 @@
-import { ReturnPromiseArray } from "../lib/array";
+import { ReturnPromiseArray } from "../types/array";
 
 export const retryPromise = async <T extends () => Promise<T>>(
   promiseFunc: T,

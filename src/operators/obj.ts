@@ -1,10 +1,10 @@
-import { RecordLike } from "../lib/like";
+import { RecordLike } from "../types/like";
 import {
   MultiMerge,
   ObjectEntries,
   ObjectKeyUnion,
   ObjectValueUnion,
-} from "../lib/object";
+} from "../types/object";
 
 export function keys<T extends {}>(obj: T) {
   return Object.keys(obj) as ObjectKeyUnion<T>[];

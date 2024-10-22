@@ -1,4 +1,4 @@
-import { RecordLike } from "../lib/like";
+import { RecordLike } from "../types/like";
 
 export function assertNonNullish<T>(value: T): asserts value is NonNullable<T> {
   if (value == null) {

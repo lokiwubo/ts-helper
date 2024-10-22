@@ -1,7 +1,7 @@
-import { ArrayConcat, FindFormIndex, Last } from "../lib/array";
-import { ArrayListLike, ArrayOrOnlyLike, RecordLike } from "../lib/like";
-import { MapFromEntriesTuple, MapFromTuple } from "../lib/map";
-import { ReadonlyUnion, SeniorMutable } from "../lib/shared";
+import { ArrayConcat, FindFormIndex, Last } from "../types/array";
+import { ArrayListLike, ArrayOrOnlyLike, RecordLike } from "../types/like";
+import { MapFromEntriesTuple, MapFromTuple } from "../types/map";
+import { ReadonlyUnion, SeniorMutable } from "../types/shared";
 
 export function filterNonNullish<T>(arr: (T | null | undefined)[]): T[] {
   return arr.filter((e) => e != null) as T[];

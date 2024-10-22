@@ -1,4 +1,4 @@
-import { GetKeysFromString, StringFormat } from "../lib/string";
+import { GetKeysFromString, StringFormat } from "../types/string";
 
 export function trimWhiteSpaces(text: string) {
   let out_text = text.trim();
