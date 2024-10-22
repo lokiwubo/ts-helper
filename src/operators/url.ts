@@ -1,4 +1,4 @@
-import { get, isArray, set } from "lodash-es";
+import { get, isArray, set } from "lodash";
 import { RecordLike } from "../types/like";
 import { ParseRecordUrlQuery, ParseUrlQueryString } from "../types/url";
 

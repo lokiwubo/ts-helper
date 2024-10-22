@@ -12,11 +12,11 @@ export type Mutable<T extends RecordLike> = {
 };
 
 export type DeepMutable<T extends RecordLike> = {
-  -readonly [Key in keyof T]: DeepMutable<T[Key]&{}>;
+  -readonly [Key in keyof T]: DeepMutable<T[Key] & {}>;
 };
 
 export type DeepRequired<T extends RecordLike> = {
-  [K in keyof T]-?: DeepRequired<T[K]&{}>;
+  [K in keyof T]-?: DeepRequired<T[K] & {}>;
 };
 
 export type PickRequired<T extends RecordLike, K extends keyof T> = {
@@ -35,7 +35,7 @@ export interface DeepRecord<T extends RecordLike> {
 }
 
 export type DeepReadonly<T extends RecordLike> = {
-  readonly [Key in keyof T]: DeepReadonly<T[Key]& {}>;
+  readonly [Key in keyof T]: DeepReadonly<T[Key] & {}>;
 };
 
 export type PackObject<TKey extends RecordKeyLike, TValue> = {
@@ -65,27 +65,30 @@ export type ObjectValueUnion<T extends RecordLike> = {
 export type ObjectPathUnion<T> = T extends (infer U)[]
   ? ObjectPathUnion<U>
   : T extends RecordLike
-  ? {
-      [K in keyof T]-?: K extends ObjectKeyUnion<T>
-        ? [K]
-        : ArrayConcat<K, ObjectPathUnion<T[K]>>;
-    }[keyof T]
-  : [];
+    ? {
+        [K in keyof T]-?: K extends ObjectKeyUnion<T>
+          ? [K]
+          : ArrayConcat<K, ObjectPathUnion<T[K]>>;
+      }[keyof T]
+    : [];
 // type objectPaths = ObjectPaths<{a:{b:{c:1}},c:{f:{g:1}}}>
 //["a"] | ["c"]
 
 export type DeepObjectKeyUnion<T> = Exclude<
   T extends RecordLike
-    ? LastFromUnion<
+    ? LastFromUnion<ObjectKeyUnion<T>> extends infer Key extends
         ObjectKeyUnion<T>
-      > extends infer Key extends ObjectKeyUnion<T>
       ? [Key] extends [never]
         ? []
         : T[Key] extends RecordLike
-        ? UnionFromArray<
-            [DeepObjectKeyUnion<Omit<T, Key>>, DeepObjectKeyUnion<T[Key]>, Key]
-          >
-        : UnionFromArray<[DeepObjectKeyUnion<Omit<T, Key>>, Key]>
+          ? UnionFromArray<
+              [
+                DeepObjectKeyUnion<Omit<T, Key>>,
+                DeepObjectKeyUnion<T[Key]>,
+                Key,
+              ]
+            >
+          : UnionFromArray<[DeepObjectKeyUnion<Omit<T, Key>>, Key]>
       : []
     : [],
   []
@@ -98,8 +101,8 @@ export type PickRequiredObjectArr<T extends RecordLike> = ObjectValueUnion<{
   [K in keyof T]: T[K] extends (infer A)[]
     ? T[K] | (A extends RecordLike ? ObjectPickArr<A> : never)
     : T[K] extends RecordLike
-    ? ObjectPickArr<T[K]>
-    : never;
+      ? ObjectPickArr<T[K]>
+      : never;
 }>;
 // type pickRequiredObjectArr = PickRequiredObjectArr<{a:[123],b:2,c?: [2222]}>
 //=> [123]
@@ -114,8 +117,8 @@ export type Merge<TFirst extends RecordLike, TTwo extends RecordLike> = {
   [Key in keyof TFirst | keyof TTwo]: Key extends keyof TTwo
     ? TTwo[Key]
     : Key extends keyof TFirst
-    ? TFirst[Key]
-    : never;
+      ? TFirst[Key]
+      : never;
 };
 //类型合并
 // type merge = Merge<{1:2},{2:1}>
@@ -123,16 +126,16 @@ export type Merge<TFirst extends RecordLike, TTwo extends RecordLike> = {
 
 export type MultiMergeHelper<
   TArrays extends RecordLike[],
-  AssignObject extends RecordLike = {}
+  AssignObject extends RecordLike = {},
 > = TArrays["length"] extends 0
   ? AssignObject
   : TArrays extends [infer Left, ...infer RightRest]
-  ? Left extends RecordLike
-    ? RightRest extends RecordLike[]
-      ? MultiMergeHelper<RightRest, Merge<AssignObject, Left>>
-      : MultiMergeHelper<[], Merge<AssignObject, Left>>
-    : Merge<AssignObject, RecordLike>
-  : Merge<AssignObject, TArrays[0]>;
+    ? Left extends RecordLike
+      ? RightRest extends RecordLike[]
+        ? MultiMergeHelper<RightRest, Merge<AssignObject, Left>>
+        : MultiMergeHelper<[], Merge<AssignObject, Left>>
+      : Merge<AssignObject, RecordLike>
+    : Merge<AssignObject, TArrays[0]>;
 
 export type MultiMerge<TArrays extends RecordLike[]> =
   MultiMergeHelper<TArrays>;
@@ -146,3 +149,25 @@ export type MergeFormUnion<RecordUnion extends RecordLike> = RecordByKeyUnion<
 // mergeUnionToRecord 会把联合类型对象合并为一个
 // type mergeUnionToRecord = MergeUnionToRecord<{ a: 1; b: 2 } | { c: 1; a: 2 }>;
 // => { a: 1 | 2; b: 2; c: 1; }
+
+/**
+ * 筛选出必填KEY
+ */
+export type RequiredKeys<T> = {
+  [K in keyof T]-?: undefined extends T[K] ? never : K;
+}[keyof T];
+/**
+ * 筛选出必填项
+ */
+export type RequiredFields<T> = Pick<T, RequiredKeys<T>>;
+
+/**
+ * 筛选出非必填KEY
+ */
+export type PartialKeys<T> = {
+  [K in keyof T]-?: undefined extends T[K] ? K : never;
+}[keyof T];
+/**
+ * 筛选出非必填项
+ */
+export type PartialFields<T> = Pick<T, RequiredKeys<T>>;

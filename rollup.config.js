@@ -20,10 +20,11 @@ export default [
         declaration: false,
       }),
     ],
+    external: ["lodash"],
   },
   {
     input: "src/index.ts",
     output: [{ file: "dist/index.d.ts", format: "es" }],
-    plugins: [dts()],
+    plugins: [dts.default()],
   },
 ];
