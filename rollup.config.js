@@ -1,28 +1,29 @@
-import alias from "@rollup/plugin-alias";
 import typescript from "@rollup/plugin-typescript";
-import pkg from "./package.json";
+import dts from "rollup-plugin-dts";
 
-export default {
-  input: "src/index.ts",
-  output: [
-    {
-      file: pkg.main,
-      format: "cjs",
-    },
-    {
-      file: pkg.module,
-      format: "esm",
-    },
-  ],
-  plugins: [
-    alias({
-      entries: [{ find: "@", replacement: "src" }], // 配置别名
-    }),
-    typescript({
-      tsconfig: "./tsconfig.json", // 指定tsconfig.json文件
-      declaration: true, // 生成.d.ts声明文件
-      declarationDir: "./dist/types", // 指定.d.ts文件的输出目录
-    }),
-  ],
-  external: [],
-};
+export default [
+  {
+    input: "src/index.ts",
+    output: [
+      {
+        file: "dist/index.js",
+        format: "cjs",
+      },
+      {
+        file: "dist/index.esm.js",
+        format: "esm",
+      },
+    ],
+    plugins: [
+      typescript({
+        tsconfig: "./tsconfig.json",
+        declaration: false,
+      }),
+    ],
+  },
+  {
+    input: "src/index.ts",
+    output: [{ file: "dist/index.d.ts", format: "es" }],
+    plugins: [dts()],
+  },
+];

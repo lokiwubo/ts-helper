@@ -9,22 +9,17 @@
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
     "moduleResolution": "node",
-    // "isolatedModules": true,
+    "isolatedModules": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    },
-    "declaration": true,
-    "declarationDir": "dist/types",
-    "emitDeclarationOnly": true
+    "noUnusedParameters": true
+    // "declaration": true,
+    // "declarationDir": "types",
+    // "emitDeclarationOnly": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules", ".todo.ts"]
+  "include": ["src"]
 }
