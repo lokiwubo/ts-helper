@@ -1,6 +1,6 @@
 {
   "name": "ts-utils-helper",
-  "version": "1.0.10",
+  "version": "1.0.12",
   "description": "ts工具类方法",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,7 +16,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git@github.com:lokiwubo/-ts-helper.git"
+    "url": "https://github.com/lokiwubo/ts-helper"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

@@ -57,3 +57,6 @@ export type BoundingClientLike = PackObject<
   "x" | "y" | "width" | "height" | "left" | "right" | "top" | "right",
   number
 >;
+
+// 定义一个类型来表示类构造函数
+export type ClassLike<T = any> = new (...args: any[]) => T;

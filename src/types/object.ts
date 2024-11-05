@@ -171,3 +171,8 @@ export type PartialKeys<T> = {
  * 筛选出非必填项
  */
 export type PartialFields<T> = Pick<T, RequiredKeys<T>>;
+
+/**
+ * 筛选出值的联合类型
+ */
+export type valueOf<T extends RecordLike, K = keyof T & string> = T[K & string];

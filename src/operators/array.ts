@@ -1,6 +1,7 @@
 import { ArrayConcat, FindFormIndex, Last } from "../types/array";
 import { ArrayListLike, ArrayOrOnlyLike, RecordLike } from "../types/like";
 import { MapFromEntriesTuple, MapFromTuple } from "../types/map";
+import { ObjectEntries } from "../types/object";
 import { ReadonlyUnion, SeniorMutable } from "../types/shared";
 
 export function filterNonNullish<T>(arr: (T | null | undefined)[]): T[] {
@@ -44,4 +45,11 @@ export function createMapFromEntries<
     | ReadonlyUnion<[...Array<[string, unknown]>]>,
 >(data: T) {
   return Object.fromEntries(data) as MapFromEntriesTuple<T>;
+}
+
+/**
+ * 创建可以推导的Entries
+ */
+export function createEntries<T extends RecordLike>(data: T) {
+  return Object.entries(data) as ObjectEntries<T>;
 }
