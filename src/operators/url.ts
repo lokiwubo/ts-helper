@@ -1,6 +1,10 @@
 import { get, isArray, set } from "lodash";
 import { RecordLike } from "../types/like";
-import { ParseRecordUrlQuery, ParseUrlQueryString } from "../types/url";
+import {
+  ExtractParam,
+  ExtractUrlQuery,
+  ParseRecordUrlQuery,
+} from "../types/url";
 
 export function queryStringify<T extends RecordLike>(obj: T) {
   const query = [];
@@ -20,9 +24,9 @@ export function queryStringify<T extends RecordLike>(obj: T) {
   return query.join("&") as ParseRecordUrlQuery<T>;
 }
 
-export function parseQueryString<T extends string>(
+export function extractQueryString<T extends string>(
   value: T,
-): ParseUrlQueryString<T> {
+): ExtractUrlQuery<T> {
   const param = {};
   value.split("&").forEach((item) => {
     const [key, value] = item.split("=");
@@ -34,4 +38,13 @@ export function parseQueryString<T extends string>(
   });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return param as any;
+}
+
+export function fillPathWithParams<T extends string, U extends ExtractParam<T>>(
+  path: T,
+  params: { [K in keyof U]: unknown },
+): string {
+  return path.replace(/:([^/]+)/g, (match, key: keyof U) => {
+    return params[key] !== undefined ? `${params[key]}` : match;
+  });
 }

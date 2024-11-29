@@ -7,4 +7,5 @@ export * from "./operators/observer";
 export * from "./operators/promise";
 export * from "./operators/shared";
 export * from "./operators/string";
+export * from "./operators/tree";
 export * from "./operators/url";

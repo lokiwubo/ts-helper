@@ -1,6 +1,6 @@
 {
   "name": "ts-utils-helper",
-  "version": "1.0.12",
+  "version": "1.0.19",
   "description": "ts工具类方法",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,21 +9,24 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src/**",
     "build": "rimraf dist && rollup --bundleConfigAsCjs -c",
-    "release:patch": "npm version patch && npm publish"
+    "release:patch": "npm version patch && npm publish",
+    "patch": "npm version patch && npm pack",
+    "watch": "nodemon --ignore dist/ --ignore node_modules/ --watch src/ -C -e ts,tsx --debug -x 'npm run build'"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lokiwubo/ts-helper"
+    "url": "https://github.com/lokiwubo/store-provider-helper"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@rollup/plugin-alias": "^5.1.1",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/lodash": "^4.17.12",
-    "eslint": "^9.9.0",
+    "eslint": "^9.15.0",
+    "nodemon": "^3.1.7",
     "prettier": "^3.3.3",
     "rimraf": "^6.0.1",
     "rollup": "^4.20.0",

@@ -1,5 +1,6 @@
 import { ArrayListLike, StringifiedLike } from "./like";
 import { Add, Sub } from "./number";
+import { AllKeys } from "./object";
 import { ReturnPromiseType } from "./shared";
 /**
  * @description 用来转为数组
@@ -174,3 +175,19 @@ export type FillArray<T extends number, V = unknown> = FillArrayHelper<
 //entries set Map
 // type mapFromEntries = MapFromEntries<[[1, "a1"], [2, "b"]]>;
 // =>  { 1: "a1"; 2: "b"; }
+
+/**
+ * @description 通过key 过滤含有该key的对象出的数组
+ */
+export type FilterByKey<
+  T extends any[],
+  U extends AllKeys<T[number]>,
+> = T extends [infer First, ...infer Rest]
+  ? First extends Record<U, any>
+    ? [First, ...FilterByKey<Rest, U>]
+    : [...FilterByKey<Rest, U>]
+  : T extends [infer First]
+    ? First extends Record<U, any>
+      ? [First]
+      : []
+    : [];

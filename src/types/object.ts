@@ -176,3 +176,8 @@ export type PartialFields<T> = Pick<T, RequiredKeys<T>>;
  * 筛选出值的联合类型
  */
 export type valueOf<T extends RecordLike, K = keyof T & string> = T[K & string];
+
+/**
+ * 获取对象的key 包括类和类型
+ */
+export type AllKeys<T> = T extends Record<infer K, any> ? K : never;

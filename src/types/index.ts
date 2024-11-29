@@ -6,5 +6,6 @@ export type * from "./number";
 export type * from "./object";
 export type * from "./shared";
 export type * from "./string";
+export type * from "./tree";
 export type * from "./url";
 export type * from "./utils";

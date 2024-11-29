@@ -19,59 +19,102 @@ type MergeParams<OneParam extends RecordLike, OtherParam extends RecordLike> = {
       ? ArrayConcat<OneParam[Key], OtherParam[Key]>
       : OneParam[Key]
     : Key extends keyof OtherParam
-    ? OtherParam[Key]
-    : never;
+      ? OtherParam[Key]
+      : never;
 };
 //用于 url query
 // type mergeParams = MergeParams<{a:1,b:2},{a:2}>
 // { a: [1, 2]; b: 2; }
 
-export type ParseUrlQueryString<Str extends string> =
+/**
+ * @description 用来提取url中的query参数
+ * @example type extractUrlQuery=  ExtractUrlQuery<"a=1& b=4&a=2"> => { a: ["1", "2"]; b: "4"; }
+ */
+export type ExtractUrlQuery<Str extends string> =
   Str extends `${infer Param}&${infer Rest}`
-    ? MergeParams<ParseQueryRecord<Param>, ParseUrlQueryString<Rest>>
+    ? MergeParams<ParseQueryRecord<Param>, ExtractUrlQuery<Rest>>
     : ParseQueryRecord<Str>;
-// type parseUrlQueryString = ParseUrlQueryString<"a=1& b =4& a= 2">;
-// =>{ a: ["1", "2"]; b: "4"; }
 
 type ArrMapToStringHelper<
   TValues extends unknown[],
   TKey extends UrlValueLike,
-  TString extends string = ``
+  TString extends string = ``,
 > = TValues["length"] extends 0
   ? TString
   : TValues extends [infer Current, ...infer Other]
-  ? ArrMapToStringHelper<
-      Other,
-      TKey,
-      StringConcat<TString, `&${TKey}=${Current & UrlValueLike}`>
-    >
-  : TString;
+    ? ArrMapToStringHelper<
+        Other,
+        TKey,
+        StringConcat<TString, `&${TKey}=${Current & UrlValueLike}`>
+      >
+    : TString;
 
 type EntriesToString<
   TArray extends unknown[],
-  TString extends string = ``
+  TString extends string = ``,
 > = TArray["length"] extends 0
   ? TString
   : TArray extends [infer Current, ...infer Other]
-  ? Current extends [string, UrlValueLike]
-    ? EntriesToString<
-        Other,
-        `${TString extends ""
-          ? `${Current[0]}=${Current[1]}`
-          : StringConcat<TString, `&${Current[0]}=${Current[1]}`>}`
-      >
-    : Current extends [string, UrlValueLike[]]
-    ? EntriesToString<
-        Other,
-        StringConcat<TString, ArrMapToStringHelper<Current[1], Current[0], "">>
-      >
-    : TString
-  : TString;
-
+    ? Current extends [string, UrlValueLike]
+      ? EntriesToString<
+          Other,
+          `${TString extends ""
+            ? `${Current[0]}=${Current[1]}`
+            : StringConcat<TString, `&${Current[0]}=${Current[1]}`>}`
+        >
+      : Current extends [string, UrlValueLike[]]
+        ? EntriesToString<
+            Other,
+            StringConcat<
+              TString,
+              ArrMapToStringHelper<Current[1], Current[0], "">
+            >
+          >
+        : TString
+    : TString;
+/**
+ * @description 用来组装query的参数
+ * @example type parseRecordUrlQuery=  ParseRecordUrlQuery<{a:1,b:[2,true]> => "a=1&b=2&b=true"
+ * @returns { string }
+ */
 export type ParseRecordUrlQuery<
   Params extends RecordLike,
-  Url extends string = ""
+  Url extends string = "",
 > = EntriesToString<ObjectEntries<Params>, Url>;
 
-// type parseRecordUrlQuery=  ParseRecordUrlQuery<{a:1,b:[2,true]}>
-// => "a=1&b=2&b=true"
+type ParseParam<Key extends string> = { [K in Key]: string };
+
+/**
+ * @description 用来解析url中的参数
+ * @example UrlParseParams<'/:id/:name/:age'> =>id: string; name: string; age: string
+ * @returns { string }
+ */
+export type UrlParseParams<Str extends string> = ParseParam<ExtractParam<Str>>;
+
+/**
+ * 填充/前缀路径
+ */
+export type PrefixedRoutePath<T extends string> = T extends `/${infer _}`
+  ? never
+  : `/${T}`;
+/**
+ * 提取params参数为联合类型
+ * @example type extractParam= ExtractParam<"/a/:b/:c"> => "a|b|c"
+ */
+
+export type ExtractParam<T extends string> =
+  T extends `${infer _Start}/:${infer Param}/${infer Rest}`
+    ? Param | ExtractParam<`/${Rest}`>
+    : T extends `${infer _Start}/:${infer Param}`
+      ? Param | ExtractParam<`/${Param}`>
+      : never;
+
+/**
+ * 判断是否有params参数
+ */
+export type HasParam<T extends string> =
+  T extends `${infer _Start}/:${infer _Param}`
+    ? true
+    : T extends `${infer _Start}/${infer Rest}`
+      ? HasParam<Rest>
+      : false;
