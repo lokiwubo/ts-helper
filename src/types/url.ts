@@ -3,16 +3,21 @@ import { RecordLike, UrlValueLike } from "./like";
 import { ObjectEntries } from "./object";
 import { StringConcat, Trim } from "./string";
 
+/**
+ * @description 用来解析url中的query参数只能解析一个值 并返回一个对象
+ * @example type parseQueryRecord= urlQueryParseRecord = ParseQueryRecord<"a=1"> => { a: "1" }
+ */
 type ParseQueryRecord<UrlQuery extends string> =
   UrlQuery extends `${infer Key}=${infer Value}`
     ? {
         [K in Key as Trim<K>]: Trim<Value>;
       }
     : {};
-// 用于 单个 query
-// type urlQueryParseRecord = ParseQueryRecord<"a=1">
-// { a: 1 }
 
+/**
+ * @description 用来合并两个query参数
+ * @example type mergeParams=  MergeParams<{a:1,b:2},{a:2}> => { a: [1, 2]; b: 2; }
+ */
 type MergeParams<OneParam extends RecordLike, OtherParam extends RecordLike> = {
   [Key in keyof OneParam | keyof OtherParam]: Key extends keyof OneParam
     ? Key extends keyof OtherParam
@@ -22,9 +27,6 @@ type MergeParams<OneParam extends RecordLike, OtherParam extends RecordLike> = {
       ? OtherParam[Key]
       : never;
 };
-//用于 url query
-// type mergeParams = MergeParams<{a:1,b:2},{a:2}>
-// { a: [1, 2]; b: 2; }
 
 /**
  * @description 用来提取url中的query参数
@@ -89,7 +91,9 @@ type ParseParam<Key extends string> = { [K in Key]: string };
  * @example UrlParseParams<'/:id/:name/:age'> =>id: string; name: string; age: string
  * @returns { string }
  */
-export type UrlParseParams<Str extends string> = ParseParam<ExtractParam<Str>>;
+export type UrlParseParams<Str extends string> = ParseParam<
+  ExtractUrlParams<Str>
+>;
 
 /**
  * 填充/前缀路径
@@ -97,16 +101,16 @@ export type UrlParseParams<Str extends string> = ParseParam<ExtractParam<Str>>;
 export type PrefixedRoutePath<T extends string> = T extends `/${infer _}`
   ? never
   : `/${T}`;
+
 /**
  * 提取params参数为联合类型
- * @example type extractParam= ExtractParam<"/a/:b/:c"> => "a|b|c"
+ * @example type ExtractUrlParams= ExtractParam<"/a/:b/:c"> => "a|b|c"
  */
-
-export type ExtractParam<T extends string> =
+export type ExtractUrlParams<T extends string> =
   T extends `${infer _Start}/:${infer Param}/${infer Rest}`
-    ? Param | ExtractParam<`/${Rest}`>
+    ? Param | ExtractUrlParams<`/${Rest}`>
     : T extends `${infer _Start}/:${infer Param}`
-      ? Param | ExtractParam<`/${Param}`>
+      ? Param | ExtractUrlParams<`/${Param}`>
       : never;
 
 /**

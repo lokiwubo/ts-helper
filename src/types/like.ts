@@ -4,12 +4,15 @@ export type NumberLike = number | `${number}`;
 export type ColorLike =
   | `#${number}`
   | `rgba(${number},${number},${number},${number})`
-  | `rgb(${number},${number},${number})`;
-type PixelUnit = "px" | "vw" | "vh" | "em" | "rem";
+  | `rgb(${number},${number},${number})`
+  | `hsl(${number},${number}%,${number}%)`
+  | `hsla(${number},${number}%,${number}%,${number})`
+  | `hsv(${number},${number}%,${number}%)`;
 
-export type PixelLike = `${number}${
-  | Uppercase<PixelUnit>
-  | Lowercase<PixelUnit>}`;
+export type LengthUnit = "px" | "em" | "rem" | "vw" | "vh" | "%";
+export type LengthLike = `${number}${
+  | Uppercase<LengthUnit>
+  | Lowercase<LengthUnit>}`;
 
 export type StringDateLike = `${string[24]}`;
 
@@ -17,7 +20,7 @@ export type NumberDateLike = number;
 
 export type NumberCountLike = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
-export type EmptyStringLike = " " | "\t" | "\n";
+export type EmptyStringLike = " " | "\t" | "\n" | "\r" | "";
 
 export type FunctionLike = (...arg: unknown[]) => unknown;
 

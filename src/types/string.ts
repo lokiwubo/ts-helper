@@ -11,58 +11,80 @@ type TrimRightHelper<S extends string> =
   S extends `${infer LeftRest}${EmptyStringLike}`
     ? TrimRightHelper<LeftRest>
     : S;
-
+/**
+ * @description 去除字符串两端的空格
+ * @example Trim<"  hello world  "> => "hello world"
+ */
 export type Trim<S extends string> = TrimLeftHelper<TrimRightHelper<S>>;
 
+/**
+ * @description 转换为字符串
+ * @example Stringify<123> => "123"
+ */
 export type Stringify<T extends StringifiedLike> = `${T}`;
 
+/**
+ * @description 获取字符串参数名
+ * @example GetKeysFromString<"{nickName}次GPT4.0额度"> => ["nickName"]
+ */
 export type GetKeysFromString<
   Str extends string,
-  Keys extends string[] = []
+  Keys extends string[] = [],
 > = Str extends `${string}{${infer ParamName extends string}}${infer End extends string}`
   ? GetKeysFromString<End, [...Keys, ParamName]>
   : Keys;
 
-// type  getKeysFromString =  GetKeysFromString<"{nickName}次GPT4.0额度">
-// =>["nickName"]
-
+/**
+ * @description 字符串格式化
+ * @example StringFormat<"{nickName}次GPT4.0额度",{nickName: '123123'}> => "123123次GPT4.0额度"
+ */
 export type StringFormat<
   Str extends string,
   Params extends Record<
     GetKeysFromString<Str>[number],
     string | number | undefined
-  >
+  >,
 > = Str extends `${infer Front extends string}{${infer ParamName}}${infer End extends string}`
   ? ParamName extends keyof Params
     ? StringFormat<`${Front}${Params[ParamName]}${End}`, Params>
     : StringFormat<`${Front}${End}`, Params>
   : Str;
-// type  formatString =  StringFormat<"{nickName}次GPT4.0额度",{nickName: '123123'}>
-// =>"123123次GPT4.0额度"
 
+/**
+ * @description 字符串连接
+ * @example StringConcat<"次GPT4.0额度", '123123'> => "次GPT4.0额度123123"
+ */
 export type StringConcat<
   TStr extends StringifiedLike,
-  UStr extends StringifiedLike
+  UStr extends StringifiedLike,
 > = `${TStr}${UStr}`;
-// type  stringConcat =  StringConcat<"次GPT4.0额度",'123123'>
-// =>"次GPT4.0额度123123"
 
+/**
+ * @description 字符串重复
+ * @example StringRepeat<"123", 3> => "123123123"
+ */
 export type StringRepeat<
   V extends StringifiedLike,
   T extends number,
-  U extends StringifiedLike = ""
+  U extends StringifiedLike = "",
 > = T extends 0 ? U : StringRepeat<V, Sub<T, 1>, `${U}${V}`>;
-// type stringRepeat = StringRepeat <"123", 3>;
-//"123123123"
 
+/**
+ * @description 替换字符串
+ * @example Replace<"hello world", "l", "L"> => "heLLo world"
+ */
 export type Replace<
   S extends string,
   MatchStr extends string,
-  ReplaceStr extends string
+  ReplaceStr extends string,
 > = S extends `${infer Left}${MatchStr}${infer Right}`
   ? `${Left}${ReplaceStr}${Right}`
   : S;
 
+/**
+ * @description 字符串联合
+ * @example CharUnion<'abc'> => "a" | "b" | "c"
+ */
 export type CharUnion<S extends string> = S extends `${infer Char}${infer Rest}`
   ? Char | CharUnion<Rest>
   : never;
@@ -70,62 +92,80 @@ export type CharUnion<S extends string> = S extends `${infer Char}${infer Rest}`
 type SplitHelper<
   S extends StringifiedLike,
   U extends string = "",
-  C extends string[] = []
+  C extends string[] = [],
 > = `${S}` extends `${infer Char}${U}${infer Rest}`
   ? SplitHelper<Rest, U, [...C, Char]>
   : [...C, S];
 
+/**
+ * @description 字符串分割
+ * @example Split<"1asdas.22", "."> => ["1asdas", "22"]
+ */
 export type Split<
   S extends StringifiedLike,
-  U extends string = ""
+  U extends string = "",
 > = SplitHelper<S, U>;
-// type split = Split<"1asdas.22", ".">;
-// ["1asdas", "22"]
 
+/**
+ * @description 字符串反转
+ * @example StringReverse<'asdfghj'> => "jhgfdsa"
+ */
 export type StringReverse<S extends StringifiedLike> = Join<Reverse<Split<S>>>;
-// type stringReverse = StringReverse<'asdfghj'>
-// "jhgfdsa"
 
+/**
+ * @description 获取字符串长度
+ * @example StringLength<'asdfghj'> => 7
+ */
 export type StringLength<S extends StringifiedLike> = Length<
   Split<Stringify<S>>
 >;
 
-// type stringLength = StringLength<'asdfghj'>
-// 7
 type SubStringHelper<
   Str extends StringifiedLike,
   F extends number,
   E extends number = StringLength<Str>,
-  Arr extends ArrayListLike = Split<Str>
+  Arr extends ArrayListLike = Split<Str>,
 > = Slice<Arr, F, E>;
 
+/**
+ * @description 获取指定索引范围的子字符串
+ * @example SubString<'asdfghj',2> => "dfghj"
+ */
 export type SubString<
   Str extends StringifiedLike,
   F extends number,
-  E extends number = StringLength<Str>
+  E extends number = StringLength<Str>,
 > = Join<SubStringHelper<Str, F, E>>;
 // type subString = SubString<'asdfghj',2>
 // "dfghj"
 
+/**
+ * @description 获取指定索引处的字符
+ * @example CharAt<'asdfghj',2> => "d"
+ */
 export type CharAt<
   Str extends StringifiedLike,
-  N extends number
+  N extends number,
 > = Split<Str>[N];
-// type charAt = CharAt<'asdfghj',2>
-// "d"
 
+/**
+ * @description 字符串是否以指定字符串开头
+ * @example StartWith<"StartsWith", "St"> => true
+ */
 export type StartWith<
   Str extends StringifiedLike,
-  CompareStr extends string
+  CompareStr extends string,
 > = `${CompareStr}${SubString<Str, StringLength<CompareStr>>}` extends Str
   ? true
   : false;
-// type startWith = StartWith<"123", "1">;
-// true
 
+/**
+ * @description 字符串是否以指定字符串结尾
+ * @example EndWith<"StartsWith", "th"> => true
+ */
 export type EndWith<
   Str extends StringifiedLike,
-  CompareStr extends string
+  CompareStr extends string,
 > = `${SubString<
   Str,
   0,
@@ -133,8 +173,6 @@ export type EndWith<
 >}${CompareStr}` extends Str
   ? true
   : false;
-// type endWith = EndWith<"StartsWith", "th">;
-// true
 
 type FillStringLengthHelper<
   Str extends StringifiedLike,
@@ -142,23 +180,38 @@ type FillStringLengthHelper<
   FillStr extends StringifiedLike,
   direction extends "start" | "end" = "start",
   AddLength extends number = Sub<Length, StringLength<Str>>,
-  FillString extends string = Join<FillArray<AddLength, FillStr>>
+  FillString extends string = Join<FillArray<AddLength, FillStr>>,
 > = direction extends "start"
   ? StringConcat<FillString, Str>
   : StringConcat<Str, FillString>;
 
+/**
+ * @description 字符串左侧填充指定长度
+ * @example StartFillStringLength<"123", 6, "0"> => "000123"
+ */
 export type StartFillStringLength<
   Str extends StringifiedLike,
   Length extends number,
-  FillStr extends StringifiedLike = " "
+  FillStr extends StringifiedLike = " ",
 > = FillStringLengthHelper<Str, Length, FillStr, "start">;
-// type startFillStringLength = StartFillStringLength<"123", 6, "0">;
-// "000123"
 
+/**
+ * @description 字符串右侧填充指定长度
+ * @example EndFillStringLength<"123", 6, "0"> => "123000"
+ */
 export type EndFillStringLength<
   Str extends StringifiedLike,
   Length extends number,
-  FillStr extends StringifiedLike = " "
+  FillStr extends StringifiedLike = " ",
 > = FillStringLengthHelper<Str, Length, FillStr, "end">;
-// type endFillStringLength = EndFillStringLength<"123", 6, "0">;
-// "123000"
+
+/**
+ * @description 排除特定子字符串
+ * @example ExcludeSubstrings<"123123456", "123"> => "456"
+ * @example ExcludeSubstrings<"123" | "456" | "789", "123"> => "456" | "789"
+ * @example ExcludeSubstrings<"/" | "home" | "dataset" | "dataset/:id", "/:"> => "/" | "home" | "dataset"
+ */
+export type ExcludeSubstrings<
+  T extends string,
+  U extends string,
+> = T extends `${infer _Prefix}${U}${infer _Suffix}` ? never : T;
