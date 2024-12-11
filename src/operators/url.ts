@@ -1,11 +1,15 @@
 import { get, isArray, set } from "lodash";
-import { RecordLike } from "../types/like";
+import { AnyLike, RecordLike } from "../types/like";
 import {
-  ExtractParam,
+  ExtractUrlParams,
   ExtractUrlQuery,
   ParseRecordUrlQuery,
 } from "../types/url";
 
+/**
+ * @example
+ *  queryStringify({a: 1, b: [2, 3], c: undefined}) // "a=1&b=2&b=3"
+ */
 export function queryStringify<T extends RecordLike>(obj: T) {
   const query = [];
   if (obj) {
@@ -24,6 +28,10 @@ export function queryStringify<T extends RecordLike>(obj: T) {
   return query.join("&") as ParseRecordUrlQuery<T>;
 }
 
+/**
+ * @example
+ *  extractQueryString("a=1&b=2&b=3") // {a: "1", b: ["2", "3"]}
+ */
 export function extractQueryString<T extends string>(
   value: T,
 ): ExtractUrlQuery<T> {
@@ -36,15 +44,18 @@ export function extractQueryString<T extends string>(
       if (key) set(param, key, [get(param, key), value].flat());
     }
   });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return param as any;
+  return param as AnyLike;
 }
 
-export function fillPathWithParams<T extends string, U extends ExtractParam<T>>(
-  path: T,
-  params: { [K in keyof U]: unknown },
-): string {
-  return path.replace(/:([^/]+)/g, (match, key: keyof U) => {
+/**
+ * @example
+ *  fillPathWithParams("/users/:id", {id: 123}) // "/users/123"
+ */
+export function fillPathWithParams<
+  T extends string,
+  U extends ExtractUrlParams<T>,
+>(path: T, params: { [K in U & string]: string }): string {
+  return path.replace(/:([^/]+)/g, (match, key: U) => {
     return params[key] !== undefined ? `${params[key]}` : match;
   });
 }

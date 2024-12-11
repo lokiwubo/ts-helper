@@ -107,12 +107,20 @@ export type PickRequiredObjectArr<T extends RecordLike> = ObjectValueUnion<{
 // type pickRequiredObjectArr = PickRequiredObjectArr<{a:[123],b:2,c?: [2222]}>
 //=> [123]
 
+/**
+ * 获取对象数组项
+ * @example
+ * type pickObjectArr = ObjectPickArr<{ a?: [123]; b: 2; c: [2222] }> => [123] | [2222]
+ */
 export type ObjectPickArr<T extends RecordLike> = PickRequiredObjectArr<
   DeepRequired<T>
 >;
-// type pickObjectArr = ObjectPickArr<{ a?: [123]; b: 2; c: [2222] }>;
-//=> [123] | [2222]
 
+/**
+ * 合并对象
+ * @example
+ * type merge = Merge<{1:2},{2:1}>  => { 2: 1; 1: 2; }
+ */
 export type Merge<TFirst extends RecordLike, TTwo extends RecordLike> = {
   [Key in keyof TFirst | keyof TTwo]: Key extends keyof TTwo
     ? TTwo[Key]
@@ -120,9 +128,6 @@ export type Merge<TFirst extends RecordLike, TTwo extends RecordLike> = {
       ? TFirst[Key]
       : never;
 };
-//类型合并
-// type merge = Merge<{1:2},{2:1}>
-// =>  { 2: 1; 1: 2; }
 
 export type MultiMergeHelper<
   TArrays extends RecordLike[],
@@ -180,4 +185,5 @@ export type valueOf<T extends RecordLike, K = keyof T & string> = T[K & string];
 /**
  * 获取对象的key 包括类和类型
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AllKeys<T> = T extends Record<infer K, any> ? K : never;

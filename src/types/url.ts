@@ -104,7 +104,7 @@ export type PrefixedRoutePath<T extends string> = T extends `/${infer _}`
 
 /**
  * 提取params参数为联合类型
- * @example type ExtractUrlParams= ExtractParam<"/a/:b/:c"> => "a|b|c"
+ * @example type ExtractUrlParams= ExtractUrlParams<"/a/:b/:c"> => "a|b|c"
  */
 export type ExtractUrlParams<T extends string> =
   T extends `${infer _Start}/:${infer Param}/${infer Rest}`

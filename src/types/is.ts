@@ -1,4 +1,4 @@
-import { ArrayListLike, NumberLike } from "./like";
+import { AnyLike, ArrayListLike, NumberLike } from "./like";
 import { Abs, GenerateNumberUnion } from "./number";
 import { Not, Or } from "./shared";
 import { CharUnion, Stringify } from "./string";
@@ -188,4 +188,13 @@ export type IsInit<N extends NumberLike> = Not<IsFloat<N>>;
  * @example
  * IsClass(class A {})=> true
  */
-export type IsClass<T> = T extends new (...args: any[]) => any ? true : false;
+export type IsClass<T> = T extends new (...args: AnyLike[]) => AnyLike
+  ? true
+  : false;
+
+/**
+ * 判断是否为函数
+ * @example
+ * IsPromise(Promise.resolve())=> true
+ */
+export type IsPromise<T> = T extends Promise<AnyLike> ? true : false;

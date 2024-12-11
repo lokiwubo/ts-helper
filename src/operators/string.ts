@@ -1,5 +1,9 @@
+import { AnyLike } from "../types";
 import { GetKeysFromString, StringFormat } from "../types/string";
 
+/**
+ * @description 移除 string 字符串两端的空白字符和幽灵连接符
+ */
 export function trimWhiteSpaces(text: string) {
   let out_text = text.trim();
   const whiteSpaceCodes = [0x200e, 0x2022];
@@ -44,7 +48,11 @@ export function hashString(text: string) {
   }
   return hash;
 }
-
+/**
+ * @description 格式化字符串
+ * @example
+ * formatString("Hello {name}, your age is {age}", {name: "John", age: 30})
+ */
 export function formatString<
   T extends string,
   O extends Record<GetKeysFromString<T>[number], string | number | undefined>,
@@ -63,6 +71,5 @@ export function formatString<
       });
     }
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return result as any;
+  return result as AnyLike;
 }

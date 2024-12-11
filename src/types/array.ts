@@ -1,4 +1,4 @@
-import { ArrayListLike, StringifiedLike } from "./like";
+import { AnyLike, ArrayListLike, StringifiedLike } from "./like";
 import { Add, Sub } from "./number";
 import { AllKeys } from "./object";
 import { ReturnPromiseType } from "./shared";
@@ -180,14 +180,14 @@ export type FillArray<T extends number, V = unknown> = FillArrayHelper<
  * @description 通过key 过滤含有该key的对象出的数组
  */
 export type FilterByKey<
-  T extends any[],
+  T extends AnyLike[],
   U extends AllKeys<T[number]>,
 > = T extends [infer First, ...infer Rest]
-  ? First extends Record<U, any>
+  ? First extends Record<U, AnyLike>
     ? [First, ...FilterByKey<Rest, U>]
     : [...FilterByKey<Rest, U>]
   : T extends [infer First]
-    ? First extends Record<U, any>
+    ? First extends Record<U, AnyLike>
       ? [First]
       : []
     : [];

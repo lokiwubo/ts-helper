@@ -1,6 +1,9 @@
 import { PackObject } from "./object";
 
 export type NumberLike = number | `${number}`;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyLike = any;
+
 export type ColorLike =
   | `#${number}`
   | `rgba(${number},${number},${number},${number})`
@@ -10,6 +13,7 @@ export type ColorLike =
   | `hsv(${number},${number}%,${number}%)`;
 
 export type LengthUnit = "px" | "em" | "rem" | "vw" | "vh" | "%";
+
 export type LengthLike = `${number}${
   | Uppercase<LengthUnit>
   | Lowercase<LengthUnit>}`;
@@ -62,4 +66,7 @@ export type BoundingClientLike = PackObject<
 >;
 
 // 定义一个类型来表示类构造函数
-export type ClassLike<T = any> = new (...args: any[]) => T;
+export type ClassLike<T = AnyLike> = new (...args: AnyLike[]) => T;
+
+// 定义一个类型来表示promise对象
+export type promiseLike<T = AnyLike> = Promise<T>;
