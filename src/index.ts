@@ -5,6 +5,7 @@ export * from "./operators/number";
 export * from "./operators/obj";
 export * from "./operators/observer";
 export * from "./operators/promise";
+export * from "./operators/proxy";
 export * from "./operators/shared";
 export * from "./operators/string";
 export * from "./operators/tree";

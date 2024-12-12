@@ -1,5 +1,5 @@
 import { ArrayConcat, UnionFromArray } from "./array";
-import { RecordKeyLike, RecordLike } from "./like";
+import { ObjectLike, RecordKeyLike, RecordLike } from "./like";
 import { LastFromUnion, UnionToTuple } from "./shared";
 import { GetUnionKeys, RecordByKeyUnion } from "./utils";
 
@@ -34,7 +34,7 @@ export interface DeepRecord<T extends RecordLike> {
   [key: string]: T | DeepRecord<T>;
 }
 
-export type DeepReadonly<T extends RecordLike> = {
+export type DeepReadonly<T extends ObjectLike> = {
   readonly [Key in keyof T]: DeepReadonly<T[Key] & {}>;
 };
 

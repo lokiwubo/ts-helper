@@ -125,6 +125,18 @@ export type UnionToTuple<T> =
 export type NonUndefined<T> = T extends undefined ? never : T;
 
 /**
+ * @name PromiseOrType
+ */
+export type PromiseEither<T> = Promise<T> | T;
+
+/**
+ * @example
+ * ExtractNumber<"123"> // 123
+ */
+export type ExtractNumber<T extends `${number}` | string> =
+  T extends `${infer N}` ? (N extends number ? N : never) : never;
+
+/**
  * 提取类类型
  * @example
  * class MyClass {
@@ -143,8 +155,3 @@ export type ExtractClass<T> = T extends new (...args: AnyLike[]) => infer R
  * type extractPromise = ExtractPromise<Promise<string>>;
  */
 export type ExtractPromise<T> = T extends Promise<infer R> ? R : T;
-
-/**
- * @name PromiseOrType
- */
-export type PromiseEither<T> = Promise<T> | T;

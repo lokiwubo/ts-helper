@@ -26,9 +26,11 @@ export type NumberCountLike = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 export type EmptyStringLike = " " | "\t" | "\n" | "\r" | "";
 
-export type FunctionLike = (...arg: unknown[]) => unknown;
+export type FunctionLike = (...arg: AnyLike[]) => AnyLike;
 
 export type RecordKeyLike = string | number | symbol;
+
+export type ObjectLike = {} | AnyLike[];
 
 export type EntriesKeyLike = string | number | boolean | undefined | null;
 
@@ -50,11 +52,11 @@ export type RecordValueLike =
   | object;
 
 export interface RecordLike {
-  [propName: RecordKeyLike]: unknown;
+  [propName: RecordKeyLike]: AnyLike;
 }
-export type ArrayListLike<T = unknown> = T[];
+export type ArrayListLike<T = AnyLike> = T[];
 
-export type ArrayOrOnlyLike<T = unknown> = T[] | T;
+export type ArrayOrOnlyLike<T = AnyLike> = T[] | T;
 
 export type UrlValueLike = string | number | boolean | null;
 
