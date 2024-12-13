@@ -52,7 +52,7 @@ export type RecordValueLike =
   | object;
 
 export interface RecordLike {
-  [propName: RecordKeyLike]: AnyLike;
+  [propName: RecordKeyLike]: unknown;
 }
 export type ArrayListLike<T = AnyLike> = T[];
 

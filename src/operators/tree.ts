@@ -27,6 +27,7 @@ export const getFlattenByTree = <
     return [...prev, curr];
   }, [] as AnyLike) as AnyLike;
 };
+
 /**
  * @description 根据 flagKey 过滤出对应数据
  */

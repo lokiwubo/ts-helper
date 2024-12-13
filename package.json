@@ -10,7 +10,7 @@
     "lint": "eslint src/**",
     "build": "rimraf dist && rollup --bundleConfigAsCjs -c",
     "release:patch": "npm version patch && npm publish",
-    "patch": "npm version patch && npm pack",
+    "patch": "npm run build && npm version patch && npm pack",
     "watch": "nodemon --ignore dist/ --ignore node_modules/ --watch src/ -C -e ts,tsx --debug -x 'npm run build'"
   },
   "keywords": [],
@@ -21,21 +21,20 @@
     "url": "https://github.com/lokiwubo/store-provider-helper"
   },
   "devDependencies": {
-    "@eslint/js": "^9.9.0",
+    "@eslint/js": "^9.16.0",
     "@rollup/plugin-alias": "^5.1.1",
     "@rollup/plugin-typescript": "^11.1.6",
-    "@types/lodash": "^4.17.12",
+    "@types/lodash": "^4.17.13",
     "eslint": "^9.16.0",
     "globals": "^15.13.0",
     "nodemon": "^3.1.7",
-    "prettier": "^3.3.3",
+    "prettier": "^3.4.2",
     "rimraf": "^6.0.1",
-    "rollup": "^4.20.0",
+    "rollup": "^4.28.1",
     "rollup-plugin-dts": "^6.1.1",
-    "rollup-plugin-terser": "^7.0.2",
-    "tslib": "^2.6.3",
-    "typescript": "^5.5.4",
-    "typescript-eslint": "^8.17.0"
+    "tslib": "^2.8.1",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0"
   },
   "files": [
     "dist"

@@ -1,6 +1,6 @@
 import typescript from "@rollup/plugin-typescript";
 import dts from "rollup-plugin-dts";
-import { terser } from "rollup-plugin-terser";
+// import { terser } from "rollup-plugin-terser";
 export default [
   {
     input: "src/index.ts",
@@ -19,10 +19,10 @@ export default [
         tsconfig: "./tsconfig.json",
         declaration: false,
       }),
-      terser({
-        compress: true, // 启用压缩
-        mangle: true, // 启用混淆
-      }),
+      // terser({
+      //   compress: true, // 启用压缩
+      //   mangle: true, // 启用混淆
+      // }),
     ],
     external: ["lodash"],
   },
