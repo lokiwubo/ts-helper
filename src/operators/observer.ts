@@ -1,4 +1,4 @@
-import { FunctionLike } from "../types/like";
+import type { FunctionLike } from "../types/like";
 
 export class Observer<TSubscriber extends FunctionLike, TData> {
   private subscribers: TSubscriber[] = [];

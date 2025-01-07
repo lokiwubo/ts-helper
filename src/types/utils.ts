@@ -1,7 +1,7 @@
-import { UnionFromArray } from "./array";
-import { AnyLike, ArrayListLike, RecordKeyLike, RecordLike } from "./like";
-import { ObjectKeyUnion, ObjectPickArr, ObjectValueUnion } from "./object";
-import { LastFromUnion } from "./shared";
+import type { UnionFromArray } from "./array";
+import type { AnyLike, ArrayListLike, RecordKeyLike, RecordLike } from "./like";
+import type { ObjectKeyUnion, ObjectPickArr, ObjectValueUnion } from "./object";
+import type { LastFromUnion } from "./shared";
 
 /**
  * @description 获取联合类型里的所有key

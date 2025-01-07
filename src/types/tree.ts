@@ -1,5 +1,5 @@
-import { RecordLike } from "./like";
-import { AllKeys } from "./object";
+import type { RecordLike } from "./like";
+import type { AllKeys } from "./object";
 
 /**
  * @description 处理单个情况

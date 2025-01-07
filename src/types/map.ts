@@ -1,5 +1,5 @@
-import { EntriesKeyLike } from "./like";
-import { ReadonlyUnion } from "./shared";
+import type { EntriesKeyLike } from "./like";
+import type { ReadonlyUnion } from "./shared";
 
 /**
  * @example

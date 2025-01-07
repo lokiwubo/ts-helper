@@ -1,4 +1,4 @@
-import { ClassLike, promiseLike } from "../types/like";
+import type { ClassLike, promiseLike } from "../types/like";
 
 export function isClass(fn: unknown): fn is ClassLike {
   return typeof fn === "function" && /^\s*class\s+/.test(fn.toString());

@@ -1,6 +1,6 @@
-import { FillArray, Length, UnionFromArray } from "./array";
-import { IsFloat } from "./is";
-import { NumberLike } from "./like";
+import type { FillArray, Length, UnionFromArray } from "./array";
+import type { IsFloat } from "./is";
+import type { NumberLike } from "./like";
 
 /**
  * @example

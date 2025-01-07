@@ -1,7 +1,7 @@
-import { AnyLike, ArrayListLike, StringifiedLike } from "./like";
-import { Add, Sub } from "./number";
-import { AllKeys } from "./object";
-import { ReturnPromiseType } from "./shared";
+import type { AnyLike, ArrayListLike, StringifiedLike } from "./like";
+import type { Add, Sub } from "./number";
+import type { AllKeys } from "./object";
+import type { ReturnPromiseType } from "./shared";
 /**
  * @description 用来转为数组
  */

@@ -1,4 +1,4 @@
-import { AnyLike } from "../types/like";
+import type { AnyLike } from "../types/like";
 
 export type MiddlewareFunType<TContext, TResponse> = (
   context: TContext,

@@ -1,5 +1,5 @@
-import { RecordLike } from "../types/like";
-import {
+import type { RecordLike } from "../types/like";
+import type {
   MultiMerge,
   ObjectEntries,
   ObjectKeyUnion,

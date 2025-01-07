@@ -1,4 +1,4 @@
-import { PackObject } from "./object";
+import type { PackObject } from "./object";
 
 export type NumberLike = number | `${number}`;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

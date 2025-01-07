@@ -1,7 +1,7 @@
-import { ArrayConcat, UnionFromArray } from "./array";
-import { ObjectLike, RecordKeyLike, RecordLike } from "./like";
-import { LastFromUnion, UnionToTuple } from "./shared";
-import { GetUnionKeys, RecordByKeyUnion } from "./utils";
+import type { ArrayConcat, UnionFromArray } from "./array";
+import type { ObjectLike, RecordKeyLike, RecordLike } from "./like";
+import type { LastFromUnion, UnionToTuple } from "./shared";
+import type { GetUnionKeys, RecordByKeyUnion } from "./utils";
 
 export type DeepPartial<T extends RecordLike> = {
   [K in keyof T]?: DeepPartial<T[K] & {}>;

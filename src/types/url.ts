@@ -1,7 +1,7 @@
-import { ArrayConcat } from "./array";
-import { RecordLike, UrlValueLike } from "./like";
-import { ObjectEntries } from "./object";
-import { StringConcat, Trim } from "./string";
+import type { ArrayConcat } from "./array";
+import type { RecordLike, UrlValueLike } from "./like";
+import type { ObjectEntries } from "./object";
+import type { StringConcat, Trim } from "./string";
 
 /**
  * @description 用来解析url中的query参数只能解析一个值 并返回一个对象

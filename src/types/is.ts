@@ -1,7 +1,7 @@
-import { AnyLike, ArrayListLike, NumberLike } from "./like";
-import { Abs, GenerateNumberUnion } from "./number";
-import { Not, Or } from "./shared";
-import { CharUnion, Stringify } from "./string";
+import type { AnyLike, ArrayListLike, NumberLike } from "./like";
+import type { Abs, GenerateNumberUnion } from "./number";
+import type { Not, Or } from "./shared";
+import type { CharUnion, Stringify } from "./string";
 
 /**
  * 判断是否为any类型

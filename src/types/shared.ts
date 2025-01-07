@@ -1,5 +1,5 @@
-import { AnyLike, ArrayListLike, RecordLike } from "./like";
-import { DeepMutable } from "./object";
+import type { AnyLike, ArrayListLike, RecordLike } from "./like";
+import type { DeepMutable } from "./object";
 
 /**
  * @description

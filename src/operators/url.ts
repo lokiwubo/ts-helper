@@ -1,6 +1,6 @@
 import { get, isArray, set } from "lodash-es";
-import { AnyLike, RecordLike } from "../types/like";
-import {
+import type { AnyLike, RecordLike } from "../types/like";
+import type {
   ExtractUrlParams,
   ExtractUrlQuery,
   ParseRecordUrlQuery,

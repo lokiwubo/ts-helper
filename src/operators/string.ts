@@ -1,5 +1,5 @@
-import { AnyLike } from "../types";
-import { GetKeysFromString, StringFormat } from "../types/string";
+import type { AnyLike } from "../types";
+import type { GetKeysFromString, StringFormat } from "../types/string";
 
 /**
  * @description 移除 string 字符串两端的空白字符和幽灵连接符

@@ -1,5 +1,5 @@
-import { AnyLike, ObjectLike } from "../types";
-import { DeepReadonly } from "../types/object";
+import type { AnyLike, ObjectLike } from "../types";
+import type { DeepReadonly } from "../types/object";
 import { isProxy } from "./is";
 import { isObject } from "./obj";
 import { shallow } from "./shared";

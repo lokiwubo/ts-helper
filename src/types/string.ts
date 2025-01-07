@@ -1,6 +1,6 @@
-import { FillArray, Join, Length, Reverse, Slice } from "./array";
-import { ArrayListLike, EmptyStringLike, StringifiedLike } from "./like";
-import { Sub } from "./number";
+import type { FillArray, Join, Length, Reverse, Slice } from "./array";
+import type { ArrayListLike, EmptyStringLike, StringifiedLike } from "./like";
+import type { Sub } from "./number";
 
 type TrimLeftHelper<S extends string> =
   S extends `${EmptyStringLike}${infer RightRest}`

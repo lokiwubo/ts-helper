@@ -1,4 +1,4 @@
-import { RecordLike } from "../types/like";
+import type { RecordLike } from "../types/like";
 
 export class TimeoutError extends Error {
   constructor(message: string) {

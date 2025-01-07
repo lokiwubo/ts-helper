@@ -1,4 +1,4 @@
-import {
+import type {
   AllKeys,
   AnyLike,
   FilterByKey,
@@ -6,7 +6,7 @@ import {
   RecordLike,
   SeniorMutable,
 } from "../types";
-import { FlattenTree } from "../types/tree";
+import type { FlattenTree } from "../types/tree";
 
 /**
  * @description 将树形结构的路由数据展平为一维数组
