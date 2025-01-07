@@ -25,3 +25,7 @@ export function isPromise(handle: unknown): handle is promiseLike {
     handle != null && typeof (handle as Promise<unknown>).then === "function"
   );
 }
+
+export function isProxy(obj: unknown): obj is ProxyConstructor {
+  return Boolean(obj && Object.getPrototypeOf(obj) === Proxy.prototype);
+}

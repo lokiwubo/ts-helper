@@ -1,4 +1,4 @@
-import { get, isArray, set } from "lodash";
+import { get, isArray, set } from "lodash-es";
 import { AnyLike, RecordLike } from "../types/like";
 import {
   ExtractUrlParams,
@@ -16,8 +16,8 @@ export function queryStringify<T extends RecordLike>(obj: T) {
     for (const key in obj) {
       const value = obj[key];
       if (value === undefined) continue;
-      if (isArray(value)) {
-        value.forEach((item: unknown) => {
+      if (value && isArray(value)) {
+        (value as Array<AnyLike>).forEach((item: unknown) => {
           query.push("".concat(key, "=", `${item}`));
         });
       } else {
@@ -50,6 +50,8 @@ export function extractQueryString<T extends string>(
 /**
  * @example
  *  fillPathWithParams("/users/:id", {id: 123}) // "/users/123"
+ * @param {string } path - 路由路劲 如 "/users/:id"
+ * @param {Record<string, string>} params - 路由参数 如 {id: 123}
  */
 export function fillPathWithParams<
   T extends string,

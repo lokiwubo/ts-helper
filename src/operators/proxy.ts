@@ -1,5 +1,7 @@
 import { AnyLike, ObjectLike } from "../types";
 import { DeepReadonly } from "../types/object";
+import { isProxy } from "./is";
+import { isObject } from "./obj";
 import { shallow } from "./shared";
 
 /**
@@ -83,3 +85,71 @@ export const createDeepReactiveProxy = <TData extends ObjectLike>(
   };
   return getProxyData(data);
 };
+
+/**
+ * @description 创建的是深度响应式的代理对象
+ * @param {ObjectLike} data 代理对象
+ * @param {ProxyHandler} proxyConfig 监听值变化的回调函数
+ */
+export const createDeepProxy = <TData extends ObjectLike>(
+  data: TData,
+  proxyConfig: ProxyHandler<TData>,
+): TData => {
+  const getProxyData = <TProxyData extends TData>(
+    inputData: TProxyData,
+  ): TProxyData => {
+    return new Proxy(inputData, {
+      set(obj, prop, value, receiver) {
+        const oldValue = Reflect.get(obj, prop, receiver);
+        // 深度代理
+        if (typeof oldValue === "object" && oldValue !== null) {
+          value = getProxyData(value);
+        }
+        // 判断是否有变化
+        if (!shallow(oldValue, value)) {
+          const flag = proxyConfig.set?.(obj, prop, value, receiver) ?? false;
+          return flag;
+        }
+        return true;
+      },
+      get(obj, prop, receiver) {
+        const value = proxyConfig.get?.(obj, prop, receiver);
+        return typeof value === "object" && value !== null
+          ? getProxyData(value as TData)
+          : value;
+      },
+      defineProperty(obj, prop, descriptor) {
+        const flag =
+          proxyConfig.defineProperty?.(obj, prop, descriptor) ?? false;
+        return flag;
+      },
+    });
+  };
+  return getProxyData(data);
+};
+/**
+ * @description 把proxy对象转换成普通对象
+ * @param {unknown} proxy 要转换的proxy对象
+ * @example
+ * const proxy = new Proxy({}, {
+ *   get(target, prop) {
+ *     return prop === "a"? 1 : target[prop]; // 假设a属性的值是1
+ *   },
+ * });
+ * const plainObject = proxyToPlainObject(proxy); // { a: 1 }
+ */
+export function proxyToPlainObject(proxy: unknown = {}) {
+  if (!isProxy(proxy)) {
+    return proxy;
+  }
+  const result = {};
+  for (const key of Reflect.ownKeys(proxy)) {
+    const value = proxy[key as keyof typeof proxy];
+    Reflect.set(
+      result,
+      key,
+      isObject(value) ? proxyToPlainObject(value) : value,
+    );
+  }
+  return result;
+}

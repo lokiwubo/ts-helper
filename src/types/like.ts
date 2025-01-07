@@ -28,7 +28,7 @@ export type EmptyStringLike = " " | "\t" | "\n" | "\r" | "";
 
 export type FunctionLike = (...arg: AnyLike[]) => AnyLike;
 
-export type RecordKeyLike = string | number | symbol;
+export type RecordKeyLike = keyof AnyLike;
 
 export type ObjectLike = {} | AnyLike[];
 
