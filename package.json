@@ -1,6 +1,6 @@
 {
   "name": "ts-utils-helper",
-  "version": "1.0.24",
+  "version": "1.0.27",
   "description": "ts工具类方法",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,8 @@
     "build": "rimraf dist && rollup -c",
     "release:patch": "npm version patch && npm publish",
     "patch": "npm run build && npm version patch && npm pack",
-    "watch": "nodemon --ignore dist/ --ignore node_modules/ --watch src/ -C -e ts,tsx --debug -x 'npm run build'"
+    "watch": "nodemon --ignore dist/ --ignore node_modules/ --watch src/ -C -e ts,tsx --debug -x 'npm run build'",
+    "publish": "node ./scripts/publish.mjs &&  publish"
   },
   "keywords": [],
   "author": "",

@@ -1,4 +1,4 @@
-import type { ClassLike, promiseLike } from "../types/like";
+import type { ClassLike, FunctionLike, promiseLike } from "../types/like";
 
 export function isClass(fn: unknown): fn is ClassLike {
   return typeof fn === "function" && /^\s*class\s+/.test(fn.toString());
@@ -29,3 +29,22 @@ export function isPromise(handle: unknown): handle is promiseLike {
 export function isProxy(obj: unknown): obj is ProxyConstructor {
   return Boolean(obj && Object.getPrototypeOf(obj) === Proxy.prototype);
 }
+
+export const isValidateNumber = (value: unknown): value is number => {
+  // 检查值是否为NaN
+  if (typeof value !== "number") {
+    return false;
+  }
+  if (Number.isNaN(value)) {
+    return false;
+  }
+  // 检查值是否为有限数字
+  if (!Number.isFinite(value)) {
+    return false;
+  }
+  return true;
+};
+
+export const isValidateFunction = (value: unknown): value is FunctionLike => {
+  return typeof value === "function";
+};

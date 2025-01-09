@@ -1,6 +1,6 @@
 import type { AnyLike } from "../types";
 import type { ReturnPromiseArray } from "../types/array";
-import type { TimeoutError } from "./shared";
+import { TimeoutError } from "./shared";
 
 /**
  * @description 执行Promise执行出错添加重试机制
