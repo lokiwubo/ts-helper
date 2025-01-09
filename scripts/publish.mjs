@@ -1,8 +1,8 @@
-import fs from "fs";
-import path from "path";
-
+import * as fs from "node:fs";
+import path from "node:path";
+import { dirname } from "path";
 // 定义要遍历的文件夹路径
-const distFolderPath = path.join(__dirname, "dist");
+const distFolderPath = path.join(dirname, "dist");
 
 // 删除 .map 文件的函数
 function deleteMapFiles(folderPath) {

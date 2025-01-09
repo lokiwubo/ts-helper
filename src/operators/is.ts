@@ -30,7 +30,7 @@ export function isProxy(obj: unknown): obj is ProxyConstructor {
   return Boolean(obj && Object.getPrototypeOf(obj) === Proxy.prototype);
 }
 
-export const isValidateNumber = (value: unknown): value is number => {
+export function isValidateNumber(value: unknown): value is number {
   // 检查值是否为NaN
   if (typeof value !== "number") {
     return false;
@@ -43,8 +43,8 @@ export const isValidateNumber = (value: unknown): value is number => {
     return false;
   }
   return true;
-};
+}
 
-export const isValidateFunction = (value: unknown): value is FunctionLike => {
+export function isValidateFunction(value: unknown): value is FunctionLike {
   return typeof value === "function";
-};
+}
