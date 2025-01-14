@@ -46,6 +46,12 @@ export type ObjectKeyUnion<T extends RecordLike> = keyof T;
 // type objectKeys = ObjectKeyUnion<{a:1,c:2}>
 // "a" | "c"
 
+/**
+ * @description 获取对象联合类型
+ * @example
+ * type objectEntriesUnion = ObjectEntriesUnion<{a:1,c:2}>
+ *  [["a", 1], ["c", 2]]
+ */
 export type ObjectEntriesUnion<T extends RecordLike> = {
   [K in keyof T]-?: [K, T[K]];
 }[keyof T];
@@ -180,7 +186,7 @@ export type PartialFields<T> = Pick<T, RequiredKeys<T>>;
 /**
  * 筛选出值的联合类型
  */
-export type valueOf<T extends RecordLike, K = keyof T & string> = T[K & string];
+export type ValueOf<T extends RecordLike, K = keyof T & string> = T[K & string];
 
 /**
  * 获取对象的key 包括类和类型

@@ -20,7 +20,17 @@ export function asNonNullish<T>(value: T | null | undefined): T {
   return value;
 }
 
-//递归
+/**
+ * 递归遍历数据
+ * @param {any} data
+ * @param { Function } callback
+ * @example const data = { a: 1, b: { c: 2, d: [3, 4, { e: 5 }] } };
+ * recursion(data, (item) => {
+ *   if (typeof item === "number") {
+ *     return item * 2;
+ *   }
+ * });
+ */
 export function recursion<T>(data: T, callback: (data: T) => T | undefined) {
   const nextData = callback && callback(data);
   if (nextData !== undefined) {
