@@ -69,7 +69,7 @@ type ExtractValidatedType<T> = T extends {
   ? R
   : never;
 
-type StructureTreeConfig<TData> = {
+export type StructureTreeConfig<TData> = {
   validate: (value: AnyLike) => value is TData;
   getChildren?: (item: TData, parent?: AnyLike) => AnyLike[];
   /**
@@ -79,7 +79,7 @@ type StructureTreeConfig<TData> = {
   getKey: (item: TData) => string;
 };
 
-type StructureTreeData<T> = {
+export type StructureTreeData<T = unknown> = {
   key: string;
   type: T;
   children: StructureTreeData<T>[];
