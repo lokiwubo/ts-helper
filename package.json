@@ -1,6 +1,6 @@
 {
   "name": "ts-utils-helper",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "description": "ts工具类方法",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,14 +13,23 @@
     "release:patch": "npm version patch && npm publish",
     "patch": "npm run build && npm version patch && npm pack",
     "watch": "nodemon --ignore dist/ --ignore node_modules/ --watch src/ -C -e ts,tsx --debug -x 'npm run build'",
-    "publish": "node  --trace-warnings ./scripts/publish.mjs && npm publish"
+    "prepublishOnly": "# rimraf dist/**/*.js.map"
+  },
+  "scriptsDescription": {
+    "test": "用于运行测试（目前未指定测试命令）",
+    "lint": "用于检查代码格式",
+    "build": "用于清理 dist 目录并构建项目",
+    "release:patch": "用于发布补丁版本",
+    "patch": "用于构建并打包补丁版本",
+    "watch": "用于监视 src 目录并在文件更改时重新构建",
+    "prepublishOnly": "用于在发布前清理 .js.map 文件（当前已注释掉）"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lokiwubo/store-provider-helper"
+    "url": "git+https://github.com/lokiwubo/store-provider-helper.git"
   },
   "devDependencies": {
     "@eslint/js": "^9.16.0",

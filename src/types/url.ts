@@ -30,7 +30,7 @@ type MergeParams<OneParam extends RecordLike, OtherParam extends RecordLike> = {
 
 /**
  * @description 用来提取url中的query参数
- * @example type extractUrlQuery=  ExtractUrlQuery<"a=1& b=4&a=2"> => { a: ["1", "2"]; b: "4"; }
+ * @example type extractUrlQuery=  ExtractUrlQuery<"a=1&b=4&a=2"> => { a: ["1", "2"]; b: "4"; }
  */
 export type ExtractUrlQuery<Str extends string> =
   Str extends `${infer Param}&${infer Rest}`

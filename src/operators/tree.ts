@@ -33,6 +33,19 @@ export const getFlattenByTree = <
 
 /**
  * @description 根据 flagKey 过滤出对应数据
+ * @example
+ * const dataList = [
+ *   { id: 1, name: "a", flag: true },
+ *   { id: 2, name: "b" },
+ *   { id: 3, name: "c", flag: true },
+ *   { id: 4, name: "d", flag: false },
+ * ];
+ * const filteredData = filterByFlagKey(dataList, "flag");
+ * filteredData = [
+ *   { id: 1, name: "a", flag: true },
+ *   { id: 3, name: "c", flag: true },
+ *   { id: 4, name: "d", flag: false },
+ * ]
  */
 export const filterByFlagKey = <
   T extends RecordLike[],
@@ -59,12 +72,17 @@ type ExtractValidatedType<T> = T extends {
 type StructureTreeConfig<TData> = {
   validate: (value: AnyLike) => value is TData;
   getChildren?: (item: TData, parent?: AnyLike) => AnyLike[];
+  /**
+   * @description 是否使用该节点该构成树 不使用的话默认子节点的父节点则默认继承上一个有效节点
+   */
+  shouldUse?: (item: TData, parent?: AnyLike) => boolean;
   getKey: (item: TData) => string;
 };
 
-type StructureTreeData = {
+type StructureTreeData<T> = {
   key: string;
-  children: StructureTreeData[];
+  type: T;
+  children: StructureTreeData<T>[];
 };
 
 export const createStructureTreeConfig = <TData>(
@@ -127,28 +145,37 @@ export const buildStructureTree = <
               classifyByConfig[type] = [];
             }
             const key = config.getKey(item);
-            const structureData: StructureTreeData = {
+            const shouldUse =
+              config.shouldUse?.(
+                item,
+                parentKey ? byKey[parentKey]?.metaData : undefined,
+              ) ?? true;
+            const structureData: StructureTreeData<keyof TConfig> = {
               key: key,
+              type: type,
               children: recursion(
                 config.getChildren?.(
                   item,
                   parentKey ? byKey[parentKey]?.metaData : undefined,
                 ),
-                key,
+                shouldUse ? key : parentKey,
               ),
             };
-            classifyByConfig[type].push(item);
-            allKeys.push(config.getKey(item));
-            byKey[structureData.key] = {
-              metaData: item,
-              parentKey: parentKey,
-              key: config.getKey(item),
-            };
-            return structureData;
+            if (shouldUse) {
+              classifyByConfig[type].push(item);
+              allKeys.push(config.getKey(item));
+              byKey[structureData.key] = {
+                metaData: item,
+                parentKey: parentKey,
+                key: config.getKey(item),
+              };
+            }
+            if (shouldUse) return structureData;
+            return structureData.children;
           }
           return null;
         }),
-      );
+      ).flat();
     }
     return [];
   };

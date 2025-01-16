@@ -193,3 +193,37 @@ export type ValueOf<T extends RecordLike, K = keyof T & string> = T[K & string];
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AllKeys<T> = T extends Record<infer K, any> ? K : never;
+
+/**
+ * 得到对象key的路径
+ * @example
+ * type keyPath = KeyPath<{a: {b: 1}, c: 2}>
+ * => "a.b" | "c"
+ */
+export type KeyPath<
+  T extends RecordLike,
+  K extends keyof T = keyof T,
+> = K extends string | number
+  ? T[K] extends RecordLike
+    ? `${K}` | `${K}.${KeyPath<T[K]>}`
+    : `${K}`
+  : never;
+
+/**
+ * 根据 KeyPath 提取对象中对应路径的值的类型
+ * @example
+ * type Value = KeyPathValue<{a: {b: 1}, c: 2}, "a.b">
+ * => 1
+ * type Value = KeyPathValue<{a: {b: 1}, c: 2}, "c">
+ * => 2
+ */
+export type KeyPathValue<
+  TRecord extends RecordLike,
+  TPath extends KeyPath<TRecord>,
+> = TPath extends `${infer K}.${infer Rest}`
+  ? K extends keyof TRecord
+    ? KeyPathValue<TRecord[K] & RecordLike, Rest>
+    : never
+  : TPath extends keyof TRecord
+    ? TRecord[TPath]
+    : never;

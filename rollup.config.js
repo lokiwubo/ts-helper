@@ -1,6 +1,6 @@
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
-import terser from "@rollup/plugin-terser";
+// import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
 import dts from "rollup-plugin-dts";
 export default [
@@ -30,10 +30,10 @@ export default [
       typescript({
         tsconfig: "./tsconfig.json",
       }),
-      terser({
-        compress: true, // 启用压缩
-        mangle: true, // 启用混淆
-      }),
+      // terser({
+      //   compress: true, // 启用压缩
+      //   mangle: true, // 启用混淆
+      // }),
     ],
   },
   {

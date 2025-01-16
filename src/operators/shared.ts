@@ -1,4 +1,4 @@
-import type { RecordLike } from "../types/like";
+import type { FunctionLike, RecordLike } from "../types/like";
 
 export class TimeoutError extends Error {
   constructor(message: string) {
@@ -145,3 +145,19 @@ export function shallowCompareValues(value1: unknown, value2: unknown) {
       return value1 === value2;
   }
 }
+
+/**
+ *
+ * @description 方法执行器 可以提示需要传入的参数类型
+ * @example const add = (a: number, b: number) => a + b;
+ * const executeAdd = actionExecutor(add, 1, 2);
+ * executeAdd(); // 3
+ */
+export const actionExecutor =
+  <TAction extends FunctionLike>(
+    action: TAction,
+    ...argument: Parameters<TAction>
+  ) =>
+  () => {
+    return Reflect.apply(action, action, argument);
+  };
