@@ -1,4 +1,5 @@
 export type * from "./array";
+export type * from "./extract";
 export type * from "./is";
 export type * from "./like";
 export type * from "./map";

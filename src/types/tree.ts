@@ -35,6 +35,13 @@ type FlattenTreeListHelper<
  * @description Flatten 把树形结构转化为扁平结构
  * @param T 结构树对象 可以是对象和数组
  * @param K 包含子节点的key 默认为children
+ * @example
+ * type Tree = {
+ *   id: number;    // 节点id
+ *   name: string;  // 节点名称
+ *   children: Tree[]; // 子节点数组
+ * }
+ * type FlattenTree = FlattenTree<Tree[], "children">; // 扁平化后的树形结构
  */
 export type FlattenTree<
   T extends RecordLike[],

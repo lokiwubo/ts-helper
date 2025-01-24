@@ -1,11 +1,13 @@
 import type { ArrayConcat } from "./array";
-import type { RecordLike, UrlValueLike } from "./like";
+import type { ExtractDynamicUrlParams } from "./extract";
+import type { AnyLike, DynamicUrlLike, RecordLike, UrlValueLike } from "./like";
 import type { ObjectEntries } from "./object";
 import type { StringConcat, Trim } from "./string";
+import type { Get } from "./utils";
 
 /**
  * @description 用来解析url中的query参数只能解析一个值 并返回一个对象
- * @example type parseQueryRecord= urlQueryParseRecord = ParseQueryRecord<"a=1"> => { a: "1" }
+ * @example type parseQueryRecord = ParseQueryRecord<"a=1"> => { a: "1" }
  */
 type ParseQueryRecord<UrlQuery extends string> =
   UrlQuery extends `${infer Key}=${infer Value}`
@@ -16,7 +18,7 @@ type ParseQueryRecord<UrlQuery extends string> =
 
 /**
  * @description 用来合并两个query参数
- * @example type mergeParams=  MergeParams<{a:1,b:2},{a:2}> => { a: [1, 2]; b: 2; }
+ * @example type mergeParams = MergeParams<{a:1,b:2},{a:2}> => { a: [1, 2]; b: 2; }
  */
 type MergeParams<OneParam extends RecordLike, OtherParam extends RecordLike> = {
   [Key in keyof OneParam | keyof OtherParam]: Key extends keyof OneParam
@@ -30,7 +32,7 @@ type MergeParams<OneParam extends RecordLike, OtherParam extends RecordLike> = {
 
 /**
  * @description 用来提取url中的query参数
- * @example type extractUrlQuery=  ExtractUrlQuery<"a=1&b=4&a=2"> => { a: ["1", "2"]; b: "4"; }
+ * @example type extractUrlQuery = ExtractUrlQuery<"a=1&b=4&a=2"> => { a: ["1", "2"]; b: "4"; }
  */
 export type ExtractUrlQuery<Str extends string> =
   Str extends `${infer Param}&${infer Rest}`
@@ -88,37 +90,48 @@ type ParseParam<Key extends string> = { [K in Key]: string };
 
 /**
  * @description 用来解析url中的参数
- * @example UrlParseParams<'/:id/:name/:age'> =>id: string; name: string; age: string
+ * @example  dynamicUrlParseParams = DynamicUrlParseParams<'/:id/:name/:age'> =>{id: string; name: string; age: string}
  * @returns { string }
  */
-export type UrlParseParams<Str extends string> = ParseParam<
-  ExtractUrlParams<Str>
+export type DynamicUrlParseParams<Str extends string> = ParseParam<
+  ExtractDynamicUrlParams<Str>
 >;
 
 /**
  * 填充/前缀路径
+ * @example type prefixedRoutePath= PrefixedRoutePath<"a"> => "/a"
  */
 export type PrefixedRoutePath<T extends string> = T extends `/${infer _}`
   ? never
   : `/${T}`;
 
 /**
- * 提取params参数为联合类型
- * @example type ExtractUrlParams= ExtractUrlParams<"/a/:b/:c"> => "a|b|c"
- */
-export type ExtractUrlParams<T extends string> =
-  T extends `${infer _Start}/:${infer Param}/${infer Rest}`
-    ? Param | ExtractUrlParams<`/${Rest}`>
-    : T extends `${infer _Start}/:${infer Param}`
-      ? Param | ExtractUrlParams<`/${Param}`>
-      : never;
-
-/**
  * 判断是否有params参数
+ * @example type isDynamicUrl= HasParam<"/a/:b/:c"> => true
  */
-export type HasParam<T extends string> =
+export type IsDynamicUrl<T extends string> =
   T extends `${infer _Start}/:${infer _Param}`
     ? true
     : T extends `${infer _Start}/${infer Rest}`
-      ? HasParam<Rest>
+      ? IsDynamicUrl<Rest>
       : false;
+
+/**
+ * Url替换params参数
+ * @example type urlReplaceParams= UrlReplaceParams<'/a/:b/:c', {b: '123', c: "dddg"}> => "/a/123/dddg"
+ */
+export type DynamicUrlReplaceParams<
+  TUrl extends DynamicUrlLike | string,
+  TParams extends {
+    [K in ExtractDynamicUrlParams<TUrl>]: AnyLike;
+  } & RecordLike,
+> = TUrl extends `${infer Before}:${infer Key}/${infer After}`
+  ? DynamicUrlReplaceParams<
+      After & DynamicUrlLike,
+      TParams
+    > extends `${infer AfterReplaced}`
+    ? `${Before}${Get<TParams, `${Key}`, "">}/${AfterReplaced}`
+    : never
+  : TUrl extends `${infer Before}:${infer Key}`
+    ? `${Before}${Get<TParams, `${Key}`, "">}`
+    : TUrl;

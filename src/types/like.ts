@@ -72,3 +72,6 @@ export type ClassLike<T = AnyLike> = new (...args: AnyLike[]) => T;
 
 // 定义一个类型来表示promise对象
 export type promiseLike<T = AnyLike> = Promise<T>;
+
+// 定义动态路由
+export type DynamicUrlLike = `${string}:${string}`;

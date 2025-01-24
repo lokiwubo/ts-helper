@@ -1,5 +1,4 @@
-import type { AnyLike, ArrayListLike, RecordLike } from "./like";
-import type { DeepMutable } from "./object";
+import type { AnyLike } from "./like";
 
 /**
  * @description
@@ -50,18 +49,11 @@ export type SeniorNonNullable<T> = Exclude<T, undefined | null>;
 
 /**
  * @description 把只读类型转为可写类型
- * @example type writable = SeniorMutable<Readonly<{a:1}>>;
+ * @example type deepWritable = DeepWritable<Readonly<{a:1}>>;
  */
-export type SeniorMutable<T> =
-  T extends Readonly<infer U>
-    ? U extends ArrayListLike | Readonly<U>
-      ? U extends readonly [...infer A]
-        ? A
-        : U
-      : U extends RecordLike
-        ? DeepMutable<U>
-        : U
-    : T;
+export type DeepWritable<T> = {
+  -readonly [P in keyof T]: DeepWritable<T[P]>;
+};
 
 /**
  * @description 转变为只读的联合类型
@@ -128,30 +120,3 @@ export type NonUndefined<T> = T extends undefined ? never : T;
  * @name PromiseOrType
  */
 export type PromiseEither<T> = Promise<T> | T;
-
-/**
- * @example
- * ExtractNumber<"123"> // 123
- */
-export type ExtractNumber<T extends `${number}` | string> =
-  T extends `${infer N}` ? (N extends number ? N : never) : never;
-
-/**
- * 提取类类型
- * @example
- * class MyClass {
- *   a=1;
- *   b=2;
- * }
- * type ExtractClass = ExtractClass<typeof MyClass>;
- */
-export type ExtractClass<T> = T extends new (...args: AnyLike[]) => infer R
-  ? R
-  : never;
-
-/**
- * 提取类类型
- * @example
- * type extractPromise = ExtractPromise<Promise<string>>;
- */
-export type ExtractPromise<T> = T extends Promise<infer R> ? R : T;

@@ -1,7 +1,8 @@
 import { get, isArray, set } from "lodash-es";
+import type { ExtractDynamicUrlParams } from "../types/extract";
 import type { AnyLike, RecordLike } from "../types/like";
 import type {
-  ExtractUrlParams,
+  DynamicUrlReplaceParams,
   ExtractUrlQuery,
   ParseRecordUrlQuery,
 } from "../types/url";
@@ -49,15 +50,18 @@ export function extractQueryString<T extends string>(
 
 /**
  * @example
- *  fillPathWithParams("/users/:id", {id: 123}) // "/users/123"
+ *  fillDynamicUrlParams("/users/:id", {id: 123}) // "/users/123"
  * @param {string } path - 路由路劲 如 "/users/:id"
  * @param {Record<string, string>} params - 路由参数 如 {id: 123}
  */
-export function fillPathWithParams<
-  T extends string,
-  U extends ExtractUrlParams<T>,
->(path: T, params: { [K in U & string]: string }): string {
+export function dynamicUrlReplaceParams<
+  T extends `${string}:${string}` | string,
+  U extends ExtractDynamicUrlParams<T> & RecordLike,
+>(
+  path: T,
+  params: { [K in U & string]: string },
+): DynamicUrlReplaceParams<T, U> {
   return path.replace(/:([^/]+)/g, (match, key: U) => {
     return params[key] !== undefined ? `${params[key]}` : match;
-  });
+  }) as AnyLike;
 }

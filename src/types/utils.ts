@@ -111,3 +111,13 @@ export type GetRecordUnionFromObject<T extends RecordLike> = UnionFromArray<
 //       | (Without<FirstType, SecondType> & SecondType)
 //       | (Without<SecondType, FirstType> & FirstType)
 //   : FirstType | SecondType;
+
+/**
+ * @description 获取对象里的某个key的值，不存在则返回默认值
+ * @example Get<{a:1,b:2}, "a", 0> => 1
+ */
+export type Get<
+  TObject extends RecordLike,
+  TKey extends keyof AnyLike,
+  TDefault = never,
+> = TKey extends keyof TObject ? TObject[TKey] : TDefault;

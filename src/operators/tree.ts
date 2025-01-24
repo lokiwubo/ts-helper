@@ -2,12 +2,13 @@ import type {
   AllKeys,
   AnyLike,
   FilterByKey,
+  FunctionLike,
   ObjectEntriesUnion,
-  ObjectValueUnion,
   ReadonlyUnion,
   RecordLike,
-  SeniorMutable,
+  ValueOf,
 } from "../types";
+import type { DeepWritable } from "../types/shared";
 import type { FlattenTree } from "../types/tree";
 import { filterNonNullish } from "./array";
 
@@ -22,7 +23,7 @@ export const getFlattenByTree = <
 >(
   dateTree: T,
   flattenKey: K,
-): FlattenTree<SeniorMutable<T>, K & string> => {
+): FlattenTree<DeepWritable<T>, K & string> => {
   return [dateTree].flat().reduce((prev, curr) => {
     if (curr[flattenKey] && Array.isArray(curr[flattenKey])) {
       return [...prev, curr, ...getFlattenByTree(curr[flattenKey], flattenKey)];
@@ -71,12 +72,13 @@ type ExtractValidatedType<T> = T extends {
 
 export type StructureTreeConfig<TData> = {
   validate: (value: AnyLike) => value is TData;
-  getChildren?: (item: TData, parent?: AnyLike) => AnyLike[];
+  getChildren?: (item: NoInfer<TData>, parent?: AnyLike) => AnyLike[];
   /**
    * @description 是否使用该节点该构成树 不使用的话默认子节点的父节点则默认继承上一个有效节点
    */
-  shouldUse?: (item: TData, parent?: AnyLike) => boolean;
-  getKey: (item: TData) => string;
+  shouldUse?: (item: NoInfer<TData>, parent?: AnyLike) => boolean;
+  getKey: (item: NoInfer<TData>) => string;
+  transform?: (item: NoInfer<TData>) => AnyLike;
 };
 
 export type StructureTreeData<T = unknown> = {
@@ -106,17 +108,12 @@ export const buildStructureTree = <
   };
 
   type ClassifyByConfig = {
-    [TKey in keyof TConfig]: ExtractValidatedType<TConfig[TKey]>[];
+    [TKey in keyof TConfig]: (TConfig[TKey]["transform"] extends FunctionLike
+      ? ReturnType<TConfig[TKey]["transform"]>
+      : ExtractValidatedType<TConfig[TKey]>)[];
   };
 
-  const byKey: Record<
-    string,
-    StructureDataMap<
-      ObjectValueUnion<{
-        [TKey in keyof TConfig]: ExtractValidatedType<TConfig[TKey]>;
-      }>
-    >
-  > = {};
+  const byKey: Record<string, StructureDataMap<ValueOf<ClassifyByConfig>>> = {};
   const allKeys: string[] = [];
   /**
    * @description 数据分类
@@ -202,3 +199,11 @@ export const buildStructureTree = <
     structureTree: recursion(data),
   };
 };
+
+/**
+ * @name recursionData
+ * @description 递归遍历数据
+ * @param  list
+ * @param keys
+ * @param cb
+ */
