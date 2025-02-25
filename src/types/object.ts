@@ -227,3 +227,13 @@ export type KeyPathValue<
   : TPath extends keyof TRecord
     ? TRecord[TPath]
     : never;
+
+/**
+ * 简单化类型  把计算类型单一化
+ * @example
+ * type simplify = Simplify<Merge<{a: {b: 1}, c: 2}, {d: 2}>>
+ * => { a: { b: 1 }; c: 2 ,d: 2}
+ */
+export type Simplify<T> = T extends object
+  ? { [K in keyof T]: Simplify<T[K]> }
+  : T;

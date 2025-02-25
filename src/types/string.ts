@@ -1,5 +1,5 @@
 import type { FillArray, Join, Length, Reverse, Slice } from "./array";
-import type { ArrayListLike, EmptyStringLike, StringifiedLike } from "./like";
+import type { ArrayListLike, EmptyStringLike, StringFieldLike } from "./like";
 import type { Sub } from "./number";
 
 type TrimLeftHelper<S extends string> =
@@ -21,7 +21,7 @@ export type Trim<S extends string> = TrimLeftHelper<TrimRightHelper<S>>;
  * @description 转换为字符串
  * @example Stringify<123> => "123"
  */
-export type Stringify<T extends StringifiedLike> = `${T}`;
+export type Stringify<T extends StringFieldLike> = `${T}`;
 
 /**
  * @description 获取字符串参数名
@@ -55,8 +55,8 @@ export type StringFormat<
  * @example StringConcat<"次GPT4.0额度", '123123'> => "次GPT4.0额度123123"
  */
 export type StringConcat<
-  TStr extends StringifiedLike,
-  UStr extends StringifiedLike,
+  TStr extends StringFieldLike,
+  UStr extends StringFieldLike,
 > = `${TStr}${UStr}`;
 
 /**
@@ -64,9 +64,9 @@ export type StringConcat<
  * @example StringRepeat<"123", 3> => "123123123"
  */
 export type StringRepeat<
-  V extends StringifiedLike,
+  V extends StringFieldLike,
   T extends number,
-  U extends StringifiedLike = "",
+  U extends StringFieldLike = "",
 > = T extends 0 ? U : StringRepeat<V, Sub<T, 1>, `${U}${V}`>;
 
 /**
@@ -90,7 +90,7 @@ export type CharUnion<S extends string> = S extends `${infer Char}${infer Rest}`
   : never;
 
 type SplitHelper<
-  S extends StringifiedLike,
+  S extends StringFieldLike,
   U extends string = "",
   C extends string[] = [],
 > = `${S}` extends `${infer Char}${U}${infer Rest}`
@@ -102,7 +102,7 @@ type SplitHelper<
  * @example Split<"1asdas.22", "."> => ["1asdas", "22"]
  */
 export type Split<
-  S extends StringifiedLike,
+  S extends StringFieldLike,
   U extends string = "",
 > = SplitHelper<S, U>;
 
@@ -110,18 +110,18 @@ export type Split<
  * @description 字符串反转
  * @example StringReverse<'asdfghj'> => "jhgfdsa"
  */
-export type StringReverse<S extends StringifiedLike> = Join<Reverse<Split<S>>>;
+export type StringReverse<S extends StringFieldLike> = Join<Reverse<Split<S>>>;
 
 /**
  * @description 获取字符串长度
  * @example StringLength<'asdfghj'> => 7
  */
-export type StringLength<S extends StringifiedLike> = Length<
+export type StringLength<S extends StringFieldLike> = Length<
   Split<Stringify<S>>
 >;
 
 type SubStringHelper<
-  Str extends StringifiedLike,
+  Str extends StringFieldLike,
   F extends number,
   E extends number = StringLength<Str>,
   Arr extends ArrayListLike = Split<Str>,
@@ -132,7 +132,7 @@ type SubStringHelper<
  * @example SubString<'asdfghj',2> => "dfghj"
  */
 export type SubString<
-  Str extends StringifiedLike,
+  Str extends StringFieldLike,
   F extends number,
   E extends number = StringLength<Str>,
 > = Join<SubStringHelper<Str, F, E>>;
@@ -144,7 +144,7 @@ export type SubString<
  * @example CharAt<'asdfghj',2> => "d"
  */
 export type CharAt<
-  Str extends StringifiedLike,
+  Str extends StringFieldLike,
   N extends number,
 > = Split<Str>[N];
 
@@ -153,7 +153,7 @@ export type CharAt<
  * @example StartWith<"StartsWith", "St"> => true
  */
 export type StartWith<
-  Str extends StringifiedLike,
+  Str extends StringFieldLike,
   CompareStr extends string,
 > = `${CompareStr}${SubString<Str, StringLength<CompareStr>>}` extends Str
   ? true
@@ -164,7 +164,7 @@ export type StartWith<
  * @example EndWith<"StartsWith", "th"> => true
  */
 export type EndWith<
-  Str extends StringifiedLike,
+  Str extends StringFieldLike,
   CompareStr extends string,
 > = `${SubString<
   Str,
@@ -175,9 +175,9 @@ export type EndWith<
   : false;
 
 type FillStringLengthHelper<
-  Str extends StringifiedLike,
+  Str extends StringFieldLike,
   Length extends number,
-  FillStr extends StringifiedLike,
+  FillStr extends StringFieldLike,
   direction extends "start" | "end" = "start",
   AddLength extends number = Sub<Length, StringLength<Str>>,
   FillString extends string = Join<FillArray<AddLength, FillStr>>,
@@ -190,9 +190,9 @@ type FillStringLengthHelper<
  * @example StartFillStringLength<"123", 6, "0"> => "000123"
  */
 export type StartFillStringLength<
-  Str extends StringifiedLike,
+  Str extends StringFieldLike,
   Length extends number,
-  FillStr extends StringifiedLike = " ",
+  FillStr extends StringFieldLike = " ",
 > = FillStringLengthHelper<Str, Length, FillStr, "start">;
 
 /**
@@ -200,9 +200,9 @@ export type StartFillStringLength<
  * @example EndFillStringLength<"123", 6, "0"> => "123000"
  */
 export type EndFillStringLength<
-  Str extends StringifiedLike,
+  Str extends StringFieldLike,
   Length extends number,
-  FillStr extends StringifiedLike = " ",
+  FillStr extends StringFieldLike = " ",
 > = FillStringLengthHelper<Str, Length, FillStr, "end">;
 
 /**

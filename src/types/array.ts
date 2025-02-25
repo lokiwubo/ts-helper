@@ -1,4 +1,4 @@
-import type { AnyLike, ArrayListLike, StringifiedLike } from "./like";
+import type { AnyLike, ArrayListLike, StringFieldLike } from "./like";
 import type { Add, Sub } from "./number";
 import type { AllKeys } from "./object";
 import type { ReturnPromiseType } from "./shared";
@@ -139,7 +139,7 @@ export type UnShift<T extends ArrayListLike, A> = [...T, A];
 export type UnionFromArray<T> = T extends (infer U)[] ? U : never;
 
 type JoinHelper<
-  A extends StringifiedLike[],
+  A extends StringFieldLike[],
   U extends string = "",
   C extends string = "",
 > =
@@ -158,7 +158,7 @@ type JoinHelper<
  * "1-2-3-4"
  */
 export type Join<
-  T extends StringifiedLike[],
+  T extends StringFieldLike[],
   U extends string = "",
 > = JoinHelper<T, U>;
 
