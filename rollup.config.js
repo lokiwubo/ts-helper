@@ -35,6 +35,7 @@ export default [
       //   mangle: true, // 启用混淆
       // }),
     ],
+    external: ["dayjs"],
   },
   {
     input: "src/index.ts",

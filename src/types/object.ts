@@ -236,4 +236,17 @@ export type KeyPathValue<
  */
 export type Simplify<T> = T extends object
   ? { [K in keyof T]: Simplify<T[K]> }
-  : T;
+  : T & {};
+
+type OptionalKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? K : never;
+}[keyof T];
+/**
+ * @description 筛选出可选项
+ * @example
+ * type pickOptional = PickOptional<{a?: 1, b: 2, c: undefined}>
+ * => {
+    a?: 1 | undefined;
+}
+ */
+export type PickOptional<T> = Pick<T, OptionalKeys<T>>;

@@ -66,3 +66,12 @@ export function pick<TObject extends RecordLike, TKey extends keyof TObject>(
     }),
   ) as unknown as Pick<TObject, TKey>;
 }
+
+export function removeUndefinedValues<T extends RecordLike>(obj: T): T {
+  return Object.keys(obj).reduce((acc: Partial<T>, key) => {
+    if (obj[key] !== undefined) {
+      acc[key] = obj[key];
+    }
+    return acc;
+  }, {} as Partial<T>) as T;
+}

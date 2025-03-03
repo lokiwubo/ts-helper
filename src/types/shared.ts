@@ -1,4 +1,4 @@
-import type { AnyLike } from "./like";
+import type { AnyLike, RecordLike } from "./like";
 
 /**
  * @description
@@ -114,9 +114,21 @@ export type UnionToTuple<T> =
  * 联合类型去除undefined
  * @example type nonUndefined = NonUndefined<string | undefined>;
  */
-export type NonUndefined<T> = T extends undefined ? never : T;
+export type ExcludeUndefined<T> = T extends undefined ? never : T;
 
 /**
  * @name PromiseOrType
  */
 export type PromiseEither<T> = Promise<T> | T;
+
+export type ExcludeUndefinedFromObject<T extends RecordLike> = {
+  [K in keyof T]: ExcludeUndefined<T[K]>;
+};
+
+/**
+ * @description 美化类型
+ * @example type pretty = Prettify<{a:1, b:2}>; => {a:1, b:2}
+ */
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};

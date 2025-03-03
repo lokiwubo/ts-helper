@@ -78,3 +78,6 @@ export type PromiseFunctionLike = (...arg: AnyLike[]) => Promise<AnyLike>;
 
 // 定义动态路由
 export type DynamicUrlLike = `${string}:${string}`;
+
+// 定义一个类型来表示日期对象
+export type DateLike = Date | string | number | `${string[24]}`;
