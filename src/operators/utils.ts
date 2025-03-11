@@ -1,3 +1,6 @@
+import type { AnyLike } from "../types/like";
+import type { DerivationType, Prettify } from "../types/shared";
+
 export const createHash = (data: unknown) => {
   const str = JSON.stringify(data);
   let hash = 0;
@@ -7,4 +10,121 @@ export const createHash = (data: unknown) => {
     hash = hash & hash;
   }
   return `${hash.toString(32)}`;
+};
+
+/**
+ * @description 数组基于某个字段去操作
+ * @param {any[] }list
+ * @param {string }key
+ * @returns
+ */
+export const getListOperator = <
+  const T extends AnyLike[],
+  TKey extends keyof T[number],
+>(
+  list: T,
+  key: TKey,
+) => {
+  const createAction = <TList extends AnyLike[]>(data: TList) => {
+    type TKeyValueUnion = TList[number][TKey];
+    return {
+      /**
+       * @description 需要排除掉的数据
+       * @param {Record<string, boolean>} mask
+       * 为 ture 排除掉
+       */
+      omit: <TMask extends Partial<{ [K in TKeyValueUnion]: boolean }>>(
+        mask: TMask,
+      ) => {
+        type OmitValueType = Prettify<{
+          [K in keyof TMask as TMask[K] extends true ? K : never]: TMask[K];
+        }>;
+        type OmitTuple<T extends AnyLike[], U> = T extends [
+          infer First extends TList[number],
+          ...infer Rest,
+        ]
+          ? `${First[TKey]}` extends U
+            ? OmitTuple<Rest, U>
+            : [First, ...OmitTuple<Rest, U>]
+          : [];
+        const omittedData = data.filter(
+          (item) => !mask[item[key] as TKeyValueUnion],
+        ) as OmitTuple<TList, keyof OmitValueType>;
+        return createAction(omittedData);
+      },
+      /**
+       * @description 提取需要的数据
+       * @param {Record<string, boolean>} mask
+       * 为 ture 需要的数据
+       */
+      pick: <TMask extends Partial<{ [K in TKeyValueUnion]: boolean }>>(
+        mask: TMask,
+      ) => {
+        type PickValueType = {
+          [K in keyof TMask as TMask[K] extends true ? K : never]: TMask[K];
+        };
+        type PickTuple<T extends AnyLike[], U> = T extends [
+          infer First extends TList[number],
+          ...infer Rest,
+        ]
+          ? `${First[TKey]}` extends U
+            ? [First, ...PickTuple<Rest, U>]
+            : [...PickTuple<Rest, U>]
+          : [];
+        const pickedData = data.filter(
+          (item) => mask[item[key] as TKeyValueUnion],
+        ) as PickTuple<TList, keyof PickValueType>;
+        return createAction(pickedData);
+      },
+      /**
+       * @description 合并
+       * @param {TList[number]} addData 要合并的数据
+       */
+      merge: <
+        const TData extends {
+          [K in keyof TList[number]]: DerivationType<TList[number][K]>;
+        },
+      >(
+        addData: TData,
+      ) => {
+        return createAction([...data, addData] as [...TList, TData]);
+      },
+      /**
+       * @description 排序
+       * @param {TKeyValueUnion[]} sorts  key 对应值的数组
+       */
+      sort: <const TSorts extends TKeyValueUnion[]>(sorts: TSorts) => {
+        type SortTuple<
+          T extends AnyLike[],
+          U extends TKeyValueUnion[],
+          TFirst extends AnyLike[number] = T extends [infer A, ...infer _B]
+            ? A
+            : never,
+          TRest extends AnyLike[] = T extends [infer _A, ...infer B]
+            ? B
+            : never,
+          TFirstSort = U extends [infer A, ...infer _B] ? A : never,
+          TRestSort extends TKeyValueUnion[] = U extends [
+            infer _A,
+            ...infer B extends TKeyValueUnion[],
+          ]
+            ? B
+            : never,
+        > = U["length"] extends 0
+          ? T
+          : TFirst[TKey] extends TFirstSort
+            ? [TFirst, ...SortTuple<TRest, TRestSort>]
+            : [...SortTuple<[...TRest, TFirst], U>];
+
+        const sortedData = data.sort((a, b) => {
+          const indexA = sorts.indexOf(a[key]);
+          const indexB = sorts.indexOf(b[key]);
+          return indexA - indexB;
+        }) as SortTuple<TList, TSorts>;
+        return createAction(sortedData);
+      },
+      getData: () => data,
+    };
+  };
+  return createAction<T>(list);
 };

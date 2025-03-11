@@ -295,6 +295,7 @@ type FillArrayHelper<
  * ```typescript
  * type fillArray = FillArray<5, "a">;
  * ["a", "a", "a"]
+ * ```
  */
 export type FillArray<T extends number, V = unknown> = FillArrayHelper<
   T,
@@ -322,3 +323,45 @@ export type FilterByKey<
       ? [First]
       : []
     : [];
+
+/**
+ * @description Exclude 从数组中排除某些元素
+ * @example
+ * ```typescript
+ * type ExcludeFromTuple = ExcludeFromArray<[1, 2, 3, 4, 5], 1>;
+ * [2, 3, 4, 5]
+ * ```
+ */
+export type ExcludeFromTuple<T extends AnyLike[], E> = T extends [
+  infer First,
+  ...infer Rest,
+]
+  ? First extends E
+    ? ExcludeFromTuple<Rest, E> // 如果当前元素是 E 类型，则跳过
+    : [First, ...ExcludeFromTuple<Rest, E>] // 否则保留当前元素
+  : [];
+
+/**
+ * @description 元组去重
+ * @example
+ * ```typescript
+ * type uniqueTuple = UniqueTuple<[1, 2, 3, 2, 1]>;
+ * [1, 2, 3]
+ * ```
+ */
+export type UniqueTuple<
+  T extends AnyLike[],
+  Result extends AnyLike[] = [],
+> = T extends [infer First, ...infer Rest]
+  ? First extends Rest[number]
+    ? UniqueTuple<Rest, Result>
+    : UniqueTuple<Rest, [...Result, First]>
+  : Result;
+
+export type FindTypeInTuple<T, U> = T extends []
+  ? never
+  : T extends [infer Head, ...infer Tail]
+    ? Head extends U
+      ? U
+      : FindTypeInTuple<Tail, U>
+    : never;

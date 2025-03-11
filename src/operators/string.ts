@@ -73,3 +73,12 @@ export function formatString<
   }
   return result as AnyLike;
 }
+/**
+ * @description 首字符串大写
+ * @param {string} str
+ * @example
+ * capitalizeFirstLetter("hello world") // "Hello world"
+ */
+export const capitalizeFirstLetter = <const T extends string>(str: T) => {
+  return (str.charAt(0).toUpperCase() + str.slice(1)) as Capitalize<T>;
+};

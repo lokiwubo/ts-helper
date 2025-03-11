@@ -132,3 +132,24 @@ export type ExcludeUndefinedFromObject<T extends RecordLike> = {
 export type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
+
+/**
+ * @description 类型推导
+ */
+export type DerivationType<T> = T extends number
+  ? number
+  : T extends string
+    ? string
+    : T extends boolean
+      ? boolean
+      : T extends bigint
+        ? bigint
+        : T extends null
+          ? null
+          : T extends undefined
+            ? undefined
+            : T extends symbol
+              ? symbol
+              : T extends object
+                ? { [K in keyof T]: DerivationType<T[K]> }
+                : T;

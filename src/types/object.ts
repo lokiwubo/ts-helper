@@ -204,9 +204,11 @@ export type KeyPath<
   T extends RecordLike,
   K extends keyof T = keyof T,
 > = K extends string | number
-  ? T[K] extends RecordLike
-    ? `${K}` | `${K}.${KeyPath<T[K]>}`
-    : `${K}`
+  ? T[K] extends []
+    ? `${K}`
+    : T[K] extends RecordLike
+      ? `${K}` | `${K}.${KeyPath<T[K]>}`
+      : `${K}`
   : never;
 
 /**
