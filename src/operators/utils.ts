@@ -1,4 +1,5 @@
 import type { AnyLike } from "../types/like";
+import type { NumberUnion } from "../types/number";
 import type { DerivationType, Prettify } from "../types/shared";
 
 export const createHash = (data: unknown) => {
@@ -27,6 +28,7 @@ export const getListOperator = <
 ) => {
   const createAction = <TList extends AnyLike[]>(data: TList) => {
     type TKeyValueUnion = TList[number][TKey];
+
     return {
       /**
        * @description 需要排除掉的数据
@@ -124,6 +126,47 @@ export const getListOperator = <
         return createAction(sortedData);
       },
       getData: () => data,
+      getDataByValue: <TValue extends TKeyValueUnion>(keyValue: TValue) => {
+        type FindTypeInTuple<T, U> = T extends []
+          ? never
+          : T extends [infer TFirst, ...infer Tail]
+            ? TFirst extends U
+              ? TFirst
+              : FindTypeInTuple<Tail, U>
+            : never;
+        return data.find(
+          (item) => item[key] === keyValue,
+        ) as unknown as FindTypeInTuple<TList, { [K in TKey]: TValue }>;
+      },
+      getValuesByKey: <
+        TKey extends keyof TList[number],
+        TValue extends TList[number][TKey],
+      >(
+        key: TKey,
+        defaultValue?: TValue,
+      ) => {
+        type MapTuple<
+          TData extends AnyLike[],
+          TKey extends keyof TData[number],
+          TFirst extends AnyLike[number] = TData extends [infer A, ...infer _B]
+            ? A
+            : never,
+          TRest extends AnyLike[] = TData extends [infer _A, ...infer B]
+            ? B
+            : never,
+        > = TData["length"] extends 0
+          ? []
+          : [TFirst[TKey], ...MapTuple<TRest, TKey>];
+        return data.map((item) => item[key] ?? defaultValue) as MapTuple<
+          TList,
+          TKey
+        >;
+      },
+      at: <TIndex extends number = NumberUnion<TList["length"]>>(
+        count: TIndex,
+      ) => {
+        return data.at(count) as TList[TIndex];
+      },
     };
   };
   return createAction<T>(list);

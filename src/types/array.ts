@@ -1,7 +1,7 @@
 import type { AnyLike, ArrayListLike, StringFieldLike } from "./like";
 import type { Add, Sub } from "./number";
 import type { AllKeys } from "./object";
-import type { ReturnPromiseType } from "./shared";
+import type { ReadonlyUnion, ReturnPromiseType } from "./shared";
 /**
  * @description 用来转为数组
  * @example
@@ -195,8 +195,6 @@ export type FindFormIndex<
     ? U
     : FindFormIndex<O, Sub<I, 1>>
   : undefined;
-// type findFormArray = FindFormIndex<[1, 2, 3, 4, 5], [1, 2, 3, 4, 5]["length"]>;
-//1
 
 type FirstHelper<
   Tuple extends ArrayListLike,
@@ -365,3 +363,11 @@ export type FindTypeInTuple<T, U> = T extends []
       ? U
       : FindTypeInTuple<Tail, U>
     : never;
+
+export type TupleIndexes<
+  T extends ReadonlyUnion<AnyLike[]>,
+  Acc extends number[] = [],
+> =
+  T extends ReadonlyUnion<[infer _, ...infer Rest]>
+    ? TupleIndexes<Rest, [...Acc, Acc["length"]]>
+    : Acc[number];

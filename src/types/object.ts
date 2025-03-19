@@ -1,6 +1,6 @@
-import type { ArrayConcat, UnionFromArray } from "./array";
-import type { ObjectLike, RecordKeyLike, RecordLike } from "./like";
-import type { LastFromUnion, UnionToTuple } from "./shared";
+import type { ArrayConcat, TupleIndexes, UnionFromArray } from "./array";
+import type { AnyLike, ObjectLike, RecordKeyLike, RecordLike } from "./like";
+import type { LastFromUnion, Prettify, UnionToTuple } from "./shared";
 import type { GetUnionKeys, RecordByKeyUnion } from "./utils";
 
 export type DeepPartial<T extends RecordLike> = {
@@ -173,6 +173,12 @@ export type RequiredKeys<T> = {
 export type RequiredFields<T> = Pick<T, RequiredKeys<T>>;
 
 /**
+ * @description 使对象属性变为必填项
+ */
+export type MakeRequired<T, K extends keyof T> = Prettify<
+  Omit<T, K> & Required<Pick<T, K>>
+>;
+/**
  * 筛选出非必填KEY
  */
 export type PartialKeys<T> = {
@@ -194,6 +200,11 @@ export type ValueOf<T extends RecordLike, K = keyof T & string> = T[K & string];
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AllKeys<T> = T extends Record<infer K, any> ? K : never;
 
+type KeyPathLike = string | number;
+
+type GetKeyUnionByRecordLike<TRecord extends RecordLike> =
+  TRecord extends AnyLike[] ? TupleIndexes<TRecord> : keyof TRecord;
+
 /**
  * 得到对象key的路径
  * @example
@@ -202,14 +213,17 @@ export type AllKeys<T> = T extends Record<infer K, any> ? K : never;
  */
 export type KeyPath<
   T extends RecordLike,
-  K extends keyof T = keyof T,
-> = K extends string | number
-  ? T[K] extends []
-    ? `${K}`
-    : T[K] extends RecordLike
-      ? `${K}` | `${K}.${KeyPath<T[K]>}`
-      : `${K}`
-  : never;
+  TExcludeKey extends KeyPathLike = "",
+  K extends KeyPathLike = GetKeyUnionByRecordLike<T> & KeyPathLike,
+> = K extends TExcludeKey
+  ? `${K}`
+  : T extends AnyLike[]
+    ? K extends K
+      ? `${K}` | `${K}.${KeyPath<T[K] & {}, TExcludeKey>}`
+      : never
+    : T extends RecordLike
+      ? `${K}` | `${K}.${KeyPath<T[K] & {}, TExcludeKey>}`
+      : never;
 
 /**
  * 根据 KeyPath 提取对象中对应路径的值的类型
@@ -224,12 +238,13 @@ export type KeyPathValue<
   TPath extends KeyPath<TRecord>,
 > = TPath extends `${infer K}.${infer Rest}`
   ? K extends keyof TRecord
-    ? KeyPathValue<TRecord[K] & RecordLike, Rest>
+    ? Rest extends KeyPath<TRecord[K] & {}, AnyLike>
+      ? KeyPathValue<TRecord[K] & {}, Rest>
+      : never
     : never
   : TPath extends keyof TRecord
     ? TRecord[TPath]
     : never;
-
 /**
  * 简单化类型  把计算类型单一化
  * @example

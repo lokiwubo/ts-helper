@@ -117,3 +117,15 @@ export type Max<T extends NumberLike, N extends NumberLike> =
  */
 export type Min<T extends NumberLike, N extends NumberLike> =
   GenerateNumberUnion<0, T> extends GenerateNumberUnion<0, N> ? N : T;
+
+/**
+ * @description 生成0-指定数字的联合类型
+ * @example
+ * NumberUnion<5> // 0 | 1 | 2 | 3 | 4 | 5
+ */
+export type NumberUnion<
+  T extends number,
+  Tuple extends number[] = [],
+> = Tuple["length"] extends T
+  ? Tuple[number]
+  : NumberUnion<T, [...Tuple, Tuple["length"]]>;
