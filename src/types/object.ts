@@ -7,13 +7,20 @@ export type DeepPartial<T extends RecordLike> = {
   [K in keyof T]?: DeepPartial<T[K] & {}>;
 };
 
-export type Mutable<T extends RecordLike> = {
-  -readonly [Key in keyof T]: T[Key];
-};
+export type Mutable<T> = {
+  -readonly [P in keyof T]: T[P];
+} & {};
 
-export type DeepMutable<T extends RecordLike> = {
-  -readonly [Key in keyof T]: DeepMutable<T[Key] & {}>;
-};
+export type DeepMutableTuple<T extends ReadonlyArray<AnyLike>> =
+  T extends Readonly<[infer IFirst, ...infer IRest]>
+    ? [DeepMutable<IFirst>, ...DeepMutableTuple<IRest>]
+    : [];
+
+export type DeepMutable<T> = {
+  -readonly [P in keyof T]: T[P] extends ReadonlyArray<AnyLike>
+    ? DeepMutableTuple<T[P]>
+    : DeepMutable<T[P]>;
+} & {};
 
 export type DeepRequired<T extends RecordLike> = {
   [K in keyof T]-?: DeepRequired<T[K] & {}>;

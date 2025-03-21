@@ -1,3 +1,4 @@
+import type { DeepMutable, Mutable } from "../types";
 import type { AnyLike } from "../types/like";
 import type { NumberUnion } from "../types/number";
 import type { DerivationType, Prettify } from "../types/shared";
@@ -33,7 +34,7 @@ export const getListOperator = <
       /**
        * @description 需要排除掉的数据
        * @param {Record<string, boolean>} mask
-       * 为 ture 排除掉
+       * 为 true 排除掉
        */
       omit: <TMask extends Partial<{ [K in TKeyValueUnion]: boolean }>>(
         mask: TMask,
@@ -170,4 +171,40 @@ export const getListOperator = <
     };
   };
   return createAction<T>(list);
+};
+
+export const delay = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+export const getMutable = <T>(data: T): Mutable<T> => {
+  return data as Mutable<T>;
+};
+
+export const getDeepMutable = <T>(data: T): DeepMutable<T> => {
+  return data as DeepMutable<T>;
+};
+type Success<T> = {
+  data: T;
+  error: null;
+};
+type Failure<T> = {
+  data: null;
+  error: T;
+};
+type Result<T, E = Error> = Success<T> | Failure<E>;
+export const tryCatch = async <T, E = Error>(
+  promiser: Promise<T>,
+): Promise<Result<T, E>> => {
+  try {
+    const data = await promiser;
+    return {
+      data,
+      error: null,
+    };
+  } catch (error) {
+    return {
+      data: null,
+      error: error as E,
+    };
+  }
 };
