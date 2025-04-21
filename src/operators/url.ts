@@ -104,3 +104,30 @@ export const createQueryUrl = <
     .replace(/\?\?+/g, "?")
     .replace(/\/\/+/g, "/") as `${TUrl}?${ParseRecordUrlQuery<TQuery>}`;
 };
+
+/**
+ * @description 创建带参数的url 支持params 和query
+ * @param url
+ * @param options
+ * @returns
+ */
+export const createUrl = (
+  url: string,
+  options?: {
+    query: RecordLike;
+    params?: RecordLike;
+  },
+) => {
+  const { params, query = {} } = options ?? {};
+  const reg = new RegExp(`/:(\\w+)`, "ig");
+  const isDynamicUrl = reg.test(url);
+  let draftUrl = url;
+  if (isDynamicUrl) {
+    if (params) {
+      draftUrl = dynamicUrlReplaceParams(draftUrl, params);
+    } else {
+      throw new Error("params is required");
+    }
+  }
+  return createQueryUrl(draftUrl, query);
+};

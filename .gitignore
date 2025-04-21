@@ -4,3 +4,5 @@
 /dist
 **.tgz
 .history/**
+/test/dist/**
+/coverage/**

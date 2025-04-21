@@ -1,5 +1,6 @@
+import { omit } from "lodash-es";
 import type { DeepMutable, Mutable } from "../types";
-import type { AnyLike } from "../types/like";
+import type { AnyLike, FunctionLike } from "../types/like";
 import type { NumberUnion } from "../types/number";
 import type { DerivationType, Prettify } from "../types/shared";
 
@@ -29,7 +30,6 @@ export const getListOperator = <
 ) => {
   const createAction = <TList extends AnyLike[]>(data: TList) => {
     type TKeyValueUnion = TList[number][TKey];
-
     return {
       /**
        * @description 需要排除掉的数据
@@ -173,13 +173,22 @@ export const getListOperator = <
   return createAction<T>(list);
 };
 
+/**
+ * @description 延时
+ * @param {number } ms
+ */
 export const delay = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
+/**
+ * @description 修改类型为可变对象
+ */
 export const getMutable = <T>(data: T): Mutable<T> => {
   return data as Mutable<T>;
 };
-
+/**
+ * @description 递归修改类型为可变对象
+ */
 export const getDeepMutable = <T>(data: T): DeepMutable<T> => {
   return data as DeepMutable<T>;
 };
@@ -192,6 +201,12 @@ type Failure<T> = {
   error: T;
 };
 type Result<T, E = Error> = Success<T> | Failure<E>;
+
+/**
+ * @description 非阻塞 try catch
+ * @param {Promise} promiser
+ * @returns { data: unknown, error: null } | { data: null, error: unknown }
+ */
 export const tryCatch = async <T, E = Error>(
   promiser: Promise<T>,
 ): Promise<Result<T, E>> => {
@@ -207,4 +222,71 @@ export const tryCatch = async <T, E = Error>(
       error: error as E,
     };
   }
+};
+
+/**
+ * @description 考虑不完善的方法 会重写 不建议使用
+ * @description 条件判断
+ */
+export const createConditionOperator = <T extends FunctionLike>(
+  getValue: T,
+) => {
+  const value = getValue();
+  type ValueType = ReturnType<T>;
+  type ConditionType = {
+    condition: (value: ValueType) => boolean;
+    metaData?: AnyLike;
+    callback: () => void;
+  };
+  const actions: ConditionType[] = [];
+  const createOperator = (value: ValueType, actions: ConditionType[]) => {
+    const conditions: ConditionType[] = actions.slice();
+    let startIndex = conditions.length;
+    return {
+      when: (condition: ConditionType["condition"]) => {
+        const index = ++startIndex;
+        const conditionItem: ConditionType = {
+          condition,
+          callback: () => {},
+          metaData: undefined,
+        };
+        const action = {
+          action: (callback: ConditionType["callback"]) => {
+            conditionItem.callback = callback;
+            conditions[index] = conditionItem;
+          },
+          addMetaData: <T>(metaData: T) => {
+            conditionItem.metaData = metaData;
+            conditions[index] = conditionItem;
+            return omit(action, ["addMetaData"]);
+          },
+        };
+        return action;
+      },
+      some: () => {
+        const draft = conditions.filter(Boolean).slice();
+        let item: ConditionType | undefined;
+        while ((item = draft.shift())) {
+          if (item.condition(value)) {
+            item.callback();
+            break;
+          }
+        }
+        return item;
+      },
+      scanAll: () => {
+        const draft = conditions.filter(Boolean).slice();
+        let item: ConditionType | undefined;
+        const result: ConditionType[] = [];
+        while ((item = draft.shift())) {
+          if (item.condition(value)) {
+            result.push(item);
+            item.callback();
+          }
+        }
+        return result;
+      },
+    };
+  };
+  return createOperator(value, actions);
 };
