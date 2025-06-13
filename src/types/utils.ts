@@ -121,3 +121,20 @@ export type Get<
   TKey extends keyof AnyLike,
   TDefault = never,
 > = TKey extends keyof TObject ? TObject[TKey] : TDefault;
+
+/**
+ * @description 创建一个selector
+ * @example
+ * const selector = createSelector(
+ *   () => state.a,
+ *   () => state.b,
+ *   (a, b) => a + b
+ * )
+ * const result = selector()
+ */
+export type CreateSelector = <TDeps extends AnyLike[], TResult>(
+  ...args: [
+    ...selectors: { [K in keyof TDeps]: () => TDeps[K] },
+    combiner: (...args: [...deps: TDeps]) => TResult,
+  ]
+) => () => TResult;

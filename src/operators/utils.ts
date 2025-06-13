@@ -1,8 +1,8 @@
-import { omit } from "lodash-es";
 import type { DeepMutable, Mutable } from "../types";
-import type { AnyLike, FunctionLike } from "../types/like";
+import type { AnyLike, FunctionLike, PromiseFunctionLike } from "../types/like";
 import type { NumberUnion } from "../types/number";
 import type { DerivationType, Prettify } from "../types/shared";
+import { isAsyncFunction } from "./is";
 
 export const createHash = (data: unknown) => {
   const str = JSON.stringify(data);
@@ -192,28 +192,27 @@ export const getMutable = <T>(data: T): Mutable<T> => {
 export const getDeepMutable = <T>(data: T): DeepMutable<T> => {
   return data as DeepMutable<T>;
 };
-type Success<T> = {
-  data: T;
-  error: null;
-};
-type Failure<T> = {
-  data: null;
-  error: T;
-};
-type Result<T, E = Error> = Success<T> | Failure<E>;
 
 /**
  * @description 非阻塞 try catch
- * @param {Promise} promiser
- * @returns { data: unknown, error: null } | { data: null, error: unknown }
+ * @returns{ { data: unknown, error: null } | { data: null, error: unknown }}
  */
-export const tryCatch = async <T, E = Error>(
-  promiser: Promise<T>,
-): Promise<Result<T, E>> => {
+export const tryCatch = async <
+  T extends FunctionLike | PromiseFunctionLike,
+  E = Error,
+>(
+  action: T,
+  ...args: Parameters<T>
+) => {
   try {
-    const data = await promiser;
+    let result;
+    if (isAsyncFunction(action)) {
+      result = await action(...args);
+    } else {
+      result = action(...args);
+    }
     return {
-      data,
+      data: result,
       error: null,
     };
   } catch (error) {
@@ -225,68 +224,179 @@ export const tryCatch = async <T, E = Error>(
 };
 
 /**
- * @description 考虑不完善的方法 会重写 不建议使用
- * @description 条件判断
+ * @description cache 缓存
+ * @param {Function} doAction 要缓存的函数
+ * @param {number} [cacheTime] 缓存时间
+ *   - undefined: 缓存永久
+ *   - 0: 不缓存
+ *   - 其他值: 缓存时间
  */
-export const createConditionOperator = <T extends FunctionLike>(
-  getValue: T,
+export const cache = <TAction extends FunctionLike | PromiseFunctionLike>(
+  doAction: TAction,
+  cacheTime?: number,
 ) => {
-  const value = getValue();
-  type ValueType = ReturnType<T>;
-  type ConditionType = {
-    condition: (value: ValueType) => boolean;
-    metaData?: AnyLike;
-    callback: () => void;
+  const cacheResult = new Map<
+    string,
+    {
+      time: number;
+      data: ReturnType<TAction>;
+    }
+  >();
+  const isAsyncFunction = (
+    func: FunctionLike | PromiseFunctionLike,
+  ): func is PromiseFunctionLike => {
+    return (
+      func.constructor.name === "AsyncFunction" ||
+      Object.prototype.toString.call(func) === "[object AsyncFunction]"
+    );
   };
-  const actions: ConditionType[] = [];
-  const createOperator = (value: ValueType, actions: ConditionType[]) => {
-    const conditions: ConditionType[] = actions.slice();
-    let startIndex = conditions.length;
+  const setCache = (key: string, data: ReturnType<TAction>) => {
+    cacheResult.set(key, {
+      time: Date.now(),
+      data: data,
+    });
+  };
+  return (
+    ...args: Parameters<TAction>
+  ): TAction extends PromiseFunctionLike
+    ? Promise<Awaited<ReturnType<TAction>>>
+    : ReturnType<TAction> => {
+    const key = createHash(args);
+    const cacheData = cacheResult.get(key);
+    /**
+     * cacheTime 为 undefined 是永久缓存
+     * cacheTime 为 0 是不缓存
+     * cacheTime 为其他值 是缓存时间
+     */
+    if (
+      cacheData &&
+      ((cacheTime !== undefined && Date.now() - cacheData.time < cacheTime) ||
+        cacheTime === undefined)
+    ) {
+      if (isAsyncFunction(doAction)) {
+        if ((cacheData.data as AnyLike) instanceof Promise) {
+          return cacheData.data as ReturnType<TAction>;
+        }
+        return Promise.resolve(cacheData.data) as AnyLike;
+      }
+      return cacheData.data;
+    }
+    const result = doAction(...args);
+    /**
+     * 判断是否未异步函数
+     */
+    setCache(key, result);
+    if (result instanceof Promise) {
+      result.then((data) => {
+        setCache(key, data);
+      });
+    }
+    return result;
+  };
+};
+
+/**
+ * @description 定义数据处理操作方法
+ * @param {TInput} value 要处理的数据
+ * @example const result = defineOperator(10).pie((value, { map }) =>
+    map((value) => `${value}` ),
+  ).value; // "10"
+ */
+export const defineOperator = <const TInput>(value: TInput) => {
+  const createOperator = <const TValue>(value: TValue) => ({
+    map: <const TOutput>(action: (value: TValue) => TOutput): TOutput => {
+      return action(value);
+    },
+  });
+  const createActions = <const TValue>(value: TValue) => {
     return {
-      when: (condition: ConditionType["condition"]) => {
-        const index = ++startIndex;
-        const conditionItem: ConditionType = {
-          condition,
-          callback: () => {},
-          metaData: undefined,
-        };
-        const action = {
-          action: (callback: ConditionType["callback"]) => {
-            conditionItem.callback = callback;
-            conditions[index] = conditionItem;
-          },
-          addMetaData: <T>(metaData: T) => {
-            conditionItem.metaData = metaData;
-            conditions[index] = conditionItem;
-            return omit(action, ["addMetaData"]);
-          },
-        };
-        return action;
+      pie: <
+        TAction extends (
+          value: TValue,
+          operators: ReturnType<typeof createOperator<TValue>>,
+        ) => AnyLike,
+      >(
+        doAction: TAction,
+      ) => {
+        const result = doAction(
+          value,
+          createOperator(value),
+        ) as ReturnType<TAction>;
+        return createActions(result);
       },
-      some: () => {
-        const draft = conditions.filter(Boolean).slice();
-        let item: ConditionType | undefined;
-        while ((item = draft.shift())) {
-          if (item.condition(value)) {
-            item.callback();
-            break;
-          }
-        }
-        return item;
-      },
-      scanAll: () => {
-        const draft = conditions.filter(Boolean).slice();
-        let item: ConditionType | undefined;
-        const result: ConditionType[] = [];
-        while ((item = draft.shift())) {
-          if (item.condition(value)) {
-            result.push(item);
-            item.callback();
-          }
-        }
-        return result;
+      get value() {
+        return value as TValue;
       },
     };
   };
-  return createOperator(value, actions);
+  return createActions(value);
+};
+
+interface ActionLike {
+  name: string;
+  do: (...ags: AnyLike[]) => AnyLike;
+  where?: () => boolean;
+}
+/**
+ * @todo 还在构思
+ * @description 用来执行actions
+ * @param {ActionLike[]} actions
+ */
+export const execAction = <TActions extends ActionLike[]>(
+  actions: TActions,
+) => {
+  const createContext = <TValue>(value: TValue) => {
+    const contextKey = Symbol.for("context");
+    return {
+      [contextKey]: value,
+      get value() {
+        return this[contextKey];
+      },
+      set value(value) {
+        this[contextKey] = value;
+      },
+    };
+  };
+  const createOperator = <TActions extends ActionLike[]>(actions: TActions) => {
+    return {
+      /**
+       * serial: 按顺序串行执行
+       */
+      serial: <TValue>(value?: TValue) => {
+        const context = createContext(value);
+        for (const action of actions) {
+          if (action.where && !action.where()) {
+            continue;
+          }
+
+          context.value = action.do(context.value);
+        }
+      },
+      /**
+       * someSerial: 只要条件为真就不往下执行
+       */
+      someSerial: <TValue>(value?: TValue) => {
+        const context = createContext(value);
+        const item = actions.find((item) => item.where && item.where());
+        if (item) {
+          item.do(context.value);
+        }
+      },
+      /**
+       * 并行执行
+       */
+      parallel: <TValue>(value?: TValue) => {
+        for (const action of actions) {
+          if (action.where && !action.where()) {
+            continue;
+          }
+          setTimeout(() => action.do(value));
+        }
+      },
+      /**
+       * parallel: 并行执行
+       */
+    };
+  };
+  return createOperator(actions);
 };
