@@ -240,18 +240,47 @@ export type KeyPath<
  * type Value = KeyPathValue<{a: {b: 1}, c: 2}, "c">
  * => 2
  */
-export type KeyPathValue<
+export type GetValueByPath<
   TRecord extends RecordLike,
   TPath extends KeyPath<TRecord>,
 > = TPath extends `${infer K}.${infer Rest}`
   ? K extends keyof TRecord
     ? Rest extends KeyPath<TRecord[K] & {}, AnyLike>
-      ? KeyPathValue<TRecord[K] & {}, Rest>
+      ? GetValueByPath<TRecord[K] & {}, Rest>
       : never
     : never
   : TPath extends keyof TRecord
     ? TRecord[TPath]
     : never;
+/**
+ * 根据 KeyPath 设置对象中对应路径的值的类型
+ * @example
+ * type Value = KeyPathValue<{a: {b: 1}, c: 2}, "a.b", 3>
+ * => { a: { b: 3 }, c: 2 }
+ */
+type SetValueByPathHelper<TRecord, TPath, TValue> =
+  TPath extends `${infer K}.${infer Rest}`
+    ? K extends keyof TRecord
+      ? Rest extends KeyPath<TRecord[K] & {}>
+        ? {
+            [P in keyof TRecord]: P extends K
+              ? SetValueByPathHelper<TRecord[K] & {}, Rest, TValue>
+              : TRecord[P];
+          }
+        : never
+      : never
+    : TPath extends keyof TRecord
+      ? {
+          [P in keyof TRecord]: P extends TPath ? TValue : TRecord[P];
+        }
+      : never;
+
+export type SetValueByPath<
+  TRecord extends RecordLike,
+  TPath extends KeyPath<TRecord>,
+  TValue,
+> = SetValueByPathHelper<TRecord, TPath, TValue>;
+
 /**
  * 简单化类型  把计算类型单一化
  * @example
