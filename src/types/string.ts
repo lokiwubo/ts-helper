@@ -215,3 +215,8 @@ export type ExcludeSubstrings<
   T extends string,
   U extends string,
 > = T extends `${infer _Prefix}${U}${infer _Suffix}` ? never : T;
+
+export type IncludeString<
+  T extends string,
+  U extends string,
+> = T extends `${string}${U}${string}` ? true : false;

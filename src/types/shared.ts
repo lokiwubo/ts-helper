@@ -153,3 +153,9 @@ export type DerivationType<T> = T extends number
               : T extends object
                 ? { [K in keyof T]: DerivationType<T[K]> }
                 : T;
+/**
+ * @description 严格匹配
+ */
+export type StrictMatch<TData extends TTemplate, TTemplate> = {
+  [K in keyof TData]: K extends keyof TTemplate ? TData[K] : never;
+};

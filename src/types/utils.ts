@@ -1,5 +1,11 @@
 import type { UnionFromArray } from "./array";
-import type { AnyLike, ArrayListLike, RecordKeyLike, RecordLike } from "./like";
+import type {
+  AnyLike,
+  ArrayListLike,
+  FunctionLike,
+  RecordKeyLike,
+  RecordLike,
+} from "./like";
 import type { ObjectKeyUnion, ObjectPickArr, ObjectValueUnion } from "./object";
 import type { LastFromUnion } from "./shared";
 
@@ -138,3 +144,6 @@ export type CreateSelector = <TDeps extends AnyLike[], TResult>(
     combiner: (...args: [...deps: TDeps]) => TResult,
   ]
 ) => () => TResult;
+
+export type ReturnPromise<T extends FunctionLike> =
+  T extends Promise<infer TOutput> ? TOutput : ReturnType<T>;

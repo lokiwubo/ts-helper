@@ -136,7 +136,7 @@ export const cache = <TAction extends FunctionLike | PromiseFunctionLike>(
 };
 
 /**
- * @description 定义数据处理操作方法
+ * @description 定义数据处理操作方法 
  * @param {TInput} value 要处理的数据
  * @example const result = defineOperator(10).pie((value, { map }) =>
     map((value) => `${value}` ),

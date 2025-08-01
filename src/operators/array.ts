@@ -142,8 +142,8 @@ export const getListOperator = <
        * @param {Record<string, boolean>} mask
        * 为 true 排除掉
        */
-      omit: <TMask extends OnlyKeys<TMask> & PartialKeyBoolean>(
-        mask: TMask,
+      omit: <TMask extends PartialKeyBoolean>(
+        mask: TMask & OnlyKeys<TMask>,
       ) => {
         type OmitValueType = Prettify<{
           [K in keyof TMask as TMask[K] extends false ? never : K]: TMask[K];
@@ -166,8 +166,8 @@ export const getListOperator = <
        * @param {Record<string, boolean>} mask
        * 为 true 需要的数据
        */
-      pick: <TMask extends OnlyKeys<TMask> & PartialKeyBoolean>(
-        mask: TMask,
+      pick: <TMask extends PartialKeyBoolean>(
+        mask: TMask & OnlyKeys<TMask>,
       ) => {
         type PickValueType = {
           [K in keyof TMask as TMask[K] extends false ? never : K]: TMask[K];

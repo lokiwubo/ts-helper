@@ -1,6 +1,11 @@
-import type { ArrayConcat, TupleIndexes, UnionFromArray } from "./array";
+import type { ArrayConcat, UnionFromArray } from "./array";
 import type { AnyLike, ObjectLike, RecordKeyLike, RecordLike } from "./like";
-import type { LastFromUnion, Prettify, UnionToTuple } from "./shared";
+import type {
+  LastFromUnion,
+  Prettify,
+  ReadonlyUnion,
+  UnionToTuple,
+} from "./shared";
 import type { GetUnionKeys, RecordByKeyUnion } from "./utils";
 
 export type DeepPartial<T extends RecordLike> = {
@@ -26,13 +31,17 @@ export type DeepRequired<T extends RecordLike> = {
   [K in keyof T]-?: DeepRequired<T[K] & {}>;
 };
 
-export type PickRequired<T extends RecordLike, K extends keyof T> = {
-  [P in K]-?: T[P];
-} & Omit<T, K>;
+export type PickRequired<T extends RecordLike, K extends keyof T> = Prettify<
+  {
+    [P in K]-?: T[P];
+  } & Omit<T, K>
+>;
 
-export type PickPartial<T extends RecordLike, K extends keyof T> = {
-  [P in K]?: T[P];
-} & Omit<T, K>;
+export type PickPartial<T extends RecordLike, K extends keyof T> = Prettify<
+  {
+    [P in K]?: T[P];
+  } & Omit<T, K>
+>;
 
 export type PickExclude<T extends RecordLike, K extends keyof T> = {
   [P in keyof T as Exclude<P, K>]: T[P];
@@ -209,9 +218,6 @@ export type AllKeys<T> = T extends Record<infer K, any> ? K : never;
 
 type KeyPathLike = string | number;
 
-type GetKeyUnionByRecordLike<TRecord extends RecordLike> =
-  TRecord extends AnyLike[] ? TupleIndexes<TRecord> : keyof TRecord;
-
 /**
  * 得到对象key的路径
  * @example
@@ -219,18 +225,18 @@ type GetKeyUnionByRecordLike<TRecord extends RecordLike> =
  * => "a.b" | "c"
  */
 export type KeyPath<
-  T extends RecordLike,
+  T extends ReadonlyUnion<RecordLike>,
   TExcludeKey extends KeyPathLike = "",
-  K extends KeyPathLike = GetKeyUnionByRecordLike<T> & KeyPathLike,
+  K extends keyof T = keyof T,
 > = K extends TExcludeKey
   ? `${K}`
-  : T extends AnyLike[]
-    ? K extends K
-      ? `${K}` | `${K}.${KeyPath<T[K] & {}, TExcludeKey>}`
-      : never
-    : T extends RecordLike
-      ? `${K}` | `${K}.${KeyPath<T[K] & {}, TExcludeKey>}`
-      : never;
+  : K extends KeyPathLike
+    ? T extends AnyLike[]
+      ? `${K & number}` | `${K & number}.${KeyPath<T[K & number], TExcludeKey>}`
+      : T[K] extends ReadonlyUnion<RecordLike>
+        ? `${K}` | `${K}.${KeyPath<T[K], TExcludeKey>}`
+        : `${K}`
+    : never;
 
 /**
  * 根据 KeyPath 提取对象中对应路径的值的类型
@@ -241,12 +247,14 @@ export type KeyPath<
  * => 2
  */
 export type GetValueByPath<
-  TRecord extends RecordLike,
-  TPath extends KeyPath<TRecord>,
+  TRecord extends ReadonlyUnion<RecordLike>,
+  TPath extends KeyPath<TRecord, AnyLike>,
 > = TPath extends `${infer K}.${infer Rest}`
   ? K extends keyof TRecord
-    ? Rest extends KeyPath<TRecord[K] & {}, AnyLike>
-      ? GetValueByPath<TRecord[K] & {}, Rest>
+    ? Rest extends KeyPath<Prettify<TRecord[K]>>
+      ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        GetValueByPath<Prettify<TRecord[K]>, Rest>
       : never
     : never
   : TPath extends keyof TRecord
@@ -261,10 +269,10 @@ export type GetValueByPath<
 type SetValueByPathHelper<TRecord, TPath, TValue> =
   TPath extends `${infer K}.${infer Rest}`
     ? K extends keyof TRecord
-      ? Rest extends KeyPath<TRecord[K] & {}>
+      ? Rest extends KeyPath<Prettify<TRecord[K]>>
         ? {
             [P in keyof TRecord]: P extends K
-              ? SetValueByPathHelper<TRecord[K] & {}, Rest, TValue>
+              ? SetValueByPathHelper<Prettify<TRecord[K]>, Rest, TValue>
               : TRecord[P];
           }
         : never

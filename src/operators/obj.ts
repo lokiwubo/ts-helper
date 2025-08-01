@@ -1,9 +1,17 @@
-import type { RecordLike } from "../types/like";
+import { produce } from "immer";
+import { get, set } from "lodash-es";
+import type { Prettify } from "../types";
+import type { AnyLike, RecordLike } from "../types/like";
 import type {
+  GetValueByPath,
+  KeyPath,
+  Merge,
   MultiMerge,
+  Mutable,
   ObjectEntries,
   ObjectKeyUnion,
   ObjectValueUnion,
+  SetValueByPath,
 } from "../types/object";
 
 export function keys<T extends {}>(obj: T) {
@@ -70,8 +78,81 @@ export function pick<TObject extends RecordLike, TKey extends keyof TObject>(
 export function removeUndefinedValues<T extends RecordLike>(obj: T): T {
   return Object.keys(obj).reduce((acc: Partial<T>, key) => {
     if (obj[key] !== undefined) {
-      acc[key] = obj[key];
+      set(acc, key, obj[key]);
     }
     return acc;
   }, {} as Partial<T>) as T;
 }
+
+export const getRecordOperator = <const T extends RecordLike>(
+  recordData: T,
+) => {
+  const createAction = <TRecord extends RecordLike>(data: TRecord) => {
+    type RecordKeyPath = KeyPath<TRecord>;
+    type OnlyKeys<T> = {
+      [K in keyof T]: K extends keyof TRecord ? boolean : never;
+    };
+    type PartialKeyBoolean = Partial<{ [K in keyof TRecord]: boolean }>;
+
+    return {
+      getData: () => data,
+      pick: <const TMask extends PartialKeyBoolean>(
+        mask: TMask & OnlyKeys<TMask>,
+      ) => {
+        type PickValueType = {
+          [K in keyof TMask as TMask[K] extends false ? never : K]: TRecord[K];
+        };
+        const pickedData = Object.fromEntries(
+          Object.entries(data).filter(([key]) => mask[key as keyof TRecord]),
+        ) as Prettify<PickValueType>;
+        return createAction(pickedData);
+      },
+      omit: <const TMask extends PartialKeyBoolean>(
+        mask: TMask & OnlyKeys<TMask>,
+      ) => {
+        type OmitValueType = {
+          [K in keyof TRecord as TMask[K] extends true ? never : K]: TRecord[K];
+        };
+        const omittedData = Object.fromEntries(
+          Object.entries(data).filter(([key]) => !mask[key as keyof TRecord]),
+        ) as Prettify<OmitValueType>;
+        return createAction(omittedData);
+      },
+      getValueByPath: <TKey extends RecordKeyPath>(
+        key: TKey,
+      ): GetValueByPath<TRecord, TKey> => {
+        return get(data, key) as AnyLike;
+      },
+      merge: <const TData extends RecordLike>(data: TData) => {
+        const newData = produce(recordData, (draft: TData) => {
+          Object.assign(draft, data);
+        });
+        return createAction(newData as Merge<TRecord, TData>);
+      },
+      update: <TKey extends RecordKeyPath, const TData>(
+        key: TKey,
+        updateData: TData | ((data: GetValueByPath<TRecord, TKey>) => TData),
+      ) => {
+        const newData = produce(recordData, (draft) => {
+          const updateValue = get(draft as TData, key) as GetValueByPath<
+            TRecord,
+            TKey
+          >;
+          if (typeof updateData === "function") {
+            set(
+              draft,
+              key,
+              (updateData as (data: GetValueByPath<TRecord, TKey>) => TData)(
+                updateValue,
+              ),
+            );
+          } else {
+            set(draft, key, updateData);
+          }
+        });
+        return createAction(newData as SetValueByPath<TRecord, TKey, TData>);
+      },
+    };
+  };
+  return createAction<Mutable<T>>(recordData);
+};

@@ -1,5 +1,5 @@
 import { get, set } from "lodash-es";
-import { filterNonNullish } from "../../.history/src/operators/array_20250107140212";
+
 import type { ExtractDynamicUrlParams } from "../types/extract";
 import type { AnyLike, RecordLike } from "../types/like";
 import type {
@@ -7,6 +7,7 @@ import type {
   ExtractUrlQuery,
   ParseRecordUrlQuery,
 } from "../types/url";
+import { filterNonNullish } from "./array";
 
 /**
  * @example
