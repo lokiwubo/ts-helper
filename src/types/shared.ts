@@ -1,4 +1,4 @@
-import type { AnyLike, RecordLike } from "./like";
+import type { AnyLike, FunctionLike, RecordLike } from "./like";
 
 /**
  * @description
@@ -159,3 +159,54 @@ export type DerivationType<T> = T extends number
 export type StrictMatch<TData extends TTemplate, TTemplate> = {
   [K in keyof TData]: K extends keyof TTemplate ? TData[K] : never;
 };
+
+/**
+ * @description 重新给函数绑定指定this 指向
+ * type ObjectDescriptor<D, M> = {
+    methods?: M & ThisType<D & M>;  // 方法中的 `this` 类型被设置为 D & M
+};
+ * @example type bound = MoveFunctionThis<(b:2) => void, {a:1}>;
+ */
+export type MoveFunctionThis<
+  TFun extends FunctionLike,
+  TThis extends {},
+> = Prettify<
+  TFun & {
+    prototype: TThis;
+  }
+>;
+
+export interface CallableFunction {
+  call<T, A extends AnyLike[], R>(
+    this: (this: T, ...args: A) => R,
+    thisArg: T,
+    ...args: A
+  ): R;
+}
+
+export interface BindableFunction {
+  bind<T, A extends AnyLike[], R>(
+    this: (this: T, ...args: A) => R,
+    thisArg: T,
+    ...args: A
+  ): (this: T, ...args: A) => R;
+}
+
+export type FunctionType<T extends AnyLike> = T extends FunctionLike
+  ? T
+  : never;
+
+export type FunctionInterface<T extends FunctionLike> =
+  T extends CallableFunction
+    ? CallableFunction
+    : T extends BindableFunction
+      ? BindableFunction
+      : never;
+
+export type FunctionInterfaceType<T extends FunctionLike> = T extends
+  | CallableFunction
+  | BindableFunction // 这里用| 而不是 & 因为有可能是两个接口的组合
+  ? T extends CallableFunction
+    ? CallableFunction
+    : BindableFunction
+  : never; // 这里用never 而不是 never 因为有可能是两个接口的组合

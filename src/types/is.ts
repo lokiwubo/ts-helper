@@ -198,3 +198,15 @@ export type IsClass<T> = T extends new (...args: AnyLike[]) => AnyLike
  * IsPromise(Promise.resolve())=> true
  */
 export type IsPromise<T> = T extends Promise<AnyLike> ? true : false;
+
+/**
+ * 判读是否为unknown类型
+ * @example
+ * IsUnknown(unknown)=> true
+ * IsUnknown(never)=> false
+ */
+export type IsUnknown<T> = unknown extends T
+  ? T extends never
+    ? false
+    : true
+  : false;
